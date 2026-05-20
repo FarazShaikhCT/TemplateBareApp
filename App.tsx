@@ -26,6 +26,7 @@ import { RemoteConfigProvider } from './src/remoteConfig/RemoteConfigContext';
 import { FeedbackProvider } from './src/feedback';
 import { NotificationsProvider } from './src/notifications';
 
+//  App component
 function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
