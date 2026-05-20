@@ -23,6 +23,29 @@ const NOTIFEE_REPEAT = {
   WEEKLY: 2,
 } as const;
 
+type NotifeeNotificationData = Record<string, string | number | object>;
+
+function toNotifeeNotificationData(
+  data: Record<string, unknown> | undefined,
+): NotifeeNotificationData | undefined {
+  if (!data) {
+    return undefined;
+  }
+
+  const result: NotifeeNotificationData = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (
+      typeof value === 'string' ||
+      typeof value === 'number' ||
+      (typeof value === 'object' && value !== null)
+    ) {
+      result[key] = value;
+    }
+  }
+
+  return Object.keys(result).length > 0 ? result : undefined;
+}
+
 class NotificationManagerClass {
   private fcmToken: string | null = null;
   /** Set when {@link getFCMToken} fails (e.g. Firebase Installations AUTHENTICATION_FAILED on Android). */
@@ -323,7 +346,7 @@ class NotificationManagerClass {
         id: notificationIdKey,
         title: notification.title,
         body: notification.body,
-        data: notification.data,
+        data: toNotifeeNotificationData(notification.data),
         android: {
           channelId,
           smallIcon: notification.android?.smallIcon || 'ic_launcher',
