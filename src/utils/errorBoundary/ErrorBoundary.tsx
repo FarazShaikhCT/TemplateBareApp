@@ -28,8 +28,7 @@ export class ErrorBoundary extends React.Component<
     return { hasError: true, error };
   }
 
-  componentDidCatch(): void {
-  }
+  componentDidCatch(): void {}
 
   handleRetry = (): void => {
     this.props.onRecover?.();

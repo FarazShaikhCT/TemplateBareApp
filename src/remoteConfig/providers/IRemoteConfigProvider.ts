@@ -3,7 +3,9 @@
  */
 export interface IRemoteConfigProvider {
   /** Apply in-app defaults before fetch; values are used when remote values are unavailable. */
-  setDefaults(defaults: Record<string, string | number | boolean>): Promise<void>;
+  setDefaults(
+    defaults: Record<string, string | number | boolean>,
+  ): Promise<void>;
   /** Fetch from the backend and activate so getters return new values. */
   fetchAndActivate(): Promise<boolean>;
   getString(key: string): string;

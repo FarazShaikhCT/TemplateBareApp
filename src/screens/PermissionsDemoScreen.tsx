@@ -35,9 +35,10 @@ function statusColor(
 }
 
 function PermissionRow({ label, permissionKey }: PermissionRowProps) {
-  const { status, isLoading, request, openSettings } = usePermission(permissionKey);
+  const { status, isLoading, request, openSettings } =
+    usePermission(permissionKey);
 
-  const styles = useThemedStyles((colors) => ({
+  const styles = useThemedStyles(colors => ({
     row: {
       width: '100%' as const,
       flexDirection: 'row' as const,
@@ -86,8 +87,8 @@ function PermissionRow({ label, permissionKey }: PermissionRowProps) {
     status === 'granted'
       ? 'Granted'
       : status === 'blocked'
-        ? 'Open Settings'
-        : 'Request';
+      ? 'Open Settings'
+      : 'Request';
 
   return (
     <View style={styles.row}>
@@ -109,7 +110,7 @@ function PermissionRow({ label, permissionKey }: PermissionRowProps) {
 }
 
 export function PermissionsDemoScreen() {
-  const styles = useThemedStyles((colors) => ({
+  const styles = useThemedStyles(colors => ({
     safeArea: {
       flex: 1,
       backgroundColor: colors.background,
@@ -171,8 +172,8 @@ export function PermissionsDemoScreen() {
                 src/permissions/configuredPermissions.ts
               </Text>{' '}
               and add entries to{' '}
-              <Text style={{ fontWeight: '700' }}>CONFIGURED_PERMISSIONS</Text>
-              , then extend{' '}
+              <Text style={{ fontWeight: '700' }}>CONFIGURED_PERMISSIONS</Text>,
+              then extend{' '}
               <Text style={{ fontWeight: '700' }}>PermissionKey</Text> in{' '}
               <Text style={{ fontWeight: '700' }}>
                 src/permissions/types.ts

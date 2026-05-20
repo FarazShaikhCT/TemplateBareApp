@@ -78,3 +78,62 @@ jest.mock('react-native-mmkv', () => ({
 jest.mock('react-native-localize', () => ({
   getLocales: () => [{ languageTag: 'en-US', languageCode: 'en' }],
 }));
+
+jest.mock('@react-native-firebase/remote-config', () => {
+  const mockRc = {};
+  const mockValue = () => ({
+    asString: () => '',
+    asBoolean: () => false,
+    asNumber: () => 0,
+  });
+
+  return {
+    __esModule: true,
+    getRemoteConfig: jest.fn(() => mockRc),
+    setDefaults: jest.fn(() => Promise.resolve()),
+    setConfigSettings: jest.fn(() => Promise.resolve()),
+    fetchAndActivate: jest.fn(() => Promise.resolve(true)),
+    getValue: jest.fn(() => mockValue()),
+    activate: jest.fn(() => Promise.resolve()),
+    onConfigUpdate: jest.fn(() => jest.fn()),
+    lastFetchStatus: jest.fn(() => 'success'),
+    fetchTimeMillis: jest.fn(() => -1),
+  };
+});
+
+jest.mock('@react-native-firebase/messaging', () => ({
+  __esModule: true,
+  default: jest.fn(() => ({
+    requestPermission: jest.fn(() => Promise.resolve(1)),
+    getToken: jest.fn(() => Promise.resolve('mock-fcm-token')),
+    onTokenRefresh: jest.fn(() => jest.fn()),
+    onMessage: jest.fn(() => jest.fn()),
+    setBackgroundMessageHandler: jest.fn(),
+    getInitialNotification: jest.fn(() => Promise.resolve(null)),
+    onNotificationOpenedApp: jest.fn(() => jest.fn()),
+    hasPermission: jest.fn(() => Promise.resolve(true)),
+    registerDeviceForRemoteMessages: jest.fn(() => Promise.resolve()),
+    isDeviceRegisteredForRemoteMessages: true,
+  })),
+}));
+
+jest.mock('@notifee/react-native', () => ({
+  __esModule: true,
+  default: {
+    requestPermission: jest.fn(() => Promise.resolve({ authorizationStatus: 1 })),
+    getNotificationSettings: jest.fn(() =>
+      Promise.resolve({ authorizationStatus: 1 }),
+    ),
+    createChannel: jest.fn(() => Promise.resolve('default')),
+    displayNotification: jest.fn(() => Promise.resolve()),
+    onForegroundEvent: jest.fn(() => jest.fn()),
+    onBackgroundEvent: jest.fn(() => jest.fn()),
+    cancelNotification: jest.fn(() => Promise.resolve()),
+    cancelAllNotifications: jest.fn(() => Promise.resolve()),
+    getInitialNotification: jest.fn(() => Promise.resolve(null)),
+  },
+  AndroidImportance: { HIGH: 4 },
+  AndroidNotificationSetting: {},
+  AuthorizationStatus: { AUTHORIZED: 1 },
+  EventType: { PRESS: 1, DISMISSED: 2 },
+}));

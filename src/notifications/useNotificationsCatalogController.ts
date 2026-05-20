@@ -17,7 +17,9 @@ function buildFcmTokenErrorAlert(detail: string | null): {
       : '';
   return {
     title: 'Could not get FCM token',
-    message: `${detail ? `${detail}\n` : ''}Push still works on iOS with APNs; on Android, FCM needs a valid Firebase Android app config.${authHint}`,
+    message: `${
+      detail ? `${detail}\n` : ''
+    }Push still works on iOS with APNs; on Android, FCM needs a valid Firebase Android app config.${authHint}`,
   };
 }
 
@@ -88,7 +90,10 @@ export function useNotificationsCatalogController() {
         await loadFCMToken();
         Alert.alert('Success', 'Notification permission granted!');
       } else {
-        Alert.alert('Permission Denied', 'Notification permission was not granted');
+        Alert.alert(
+          'Permission Denied',
+          'Notification permission was not granted',
+        );
       }
     } catch (error) {
       console.error('Permission request error:', error);
