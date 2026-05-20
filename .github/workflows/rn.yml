@@ -1,0 +1,129 @@
+# React Native CI/CD — orchestrator: JS + native dev builds (bare or Expo with committed ios/android).
+
+name: React Native CI/CD
+
+on:
+  push:
+    branches: [main, master, development]
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+    branches: [main, master, development]
+  workflow_dispatch:
+    inputs:
+      build_system:
+        description: "auto (expo if package.json lists expo) | bare | expo"
+        type: choice
+        options: [auto, bare, expo]
+        default: auto
+      package_manager:
+        description: "auto | npm | yarn (passed to install_js_deps in reusable jobs that support it)"
+        type: string
+        default: auto
+      run_internal_release_only:
+        description: Reserved for internal-only mode
+        type: boolean
+        default: false
+
+concurrency:
+  group: rn-ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      build_system: ${{ steps.pick.outputs.build_system }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: pick
+        run: |
+          set -euo pipefail
+          BS="${{ github.event.inputs.build_system }}"
+          if [ -z "${BS:-}" ] || [ "$BS" = "auto" ]; then
+            if python3 -c "import json; p=json.load(open('package.json')); d={**p.get('dependencies',{}),**p.get('devDependencies',{})}; raise SystemExit(0 if 'expo' in d else 1)" 2>/dev/null; then
+              echo "build_system=expo" >> "$GITHUB_OUTPUT"
+            else
+              echo "build_system=bare" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "build_system=$BS" >> "$GITHUB_OUTPUT"
+          fi
+
+  js-lint:
+    needs: [detect]
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.run_internal_release_only == false }}
+    uses: ./.github/workflows/rn-job-js-lint.yml
+
+  security:
+    needs: [detect]
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.run_internal_release_only == false }}
+    uses: ./.github/workflows/rn-job-security.yml
+    secrets: inherit
+
+  js-test:
+    needs: [js-lint, security]
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.run_internal_release_only == false }}
+    uses: ./.github/workflows/rn-job-js-test.yml
+    with:
+      coverage_threshold_percent: "80"
+
+  # Gate: Expo apps must commit android/ + ios/ (expo prebuild); bare repos no-op here. Same ref as native jobs (PR head).
+  expo-native-dirs:
+    if: |
+      (github.event_name != 'workflow_dispatch' || inputs.run_internal_release_only == false) &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/development')) ||
+       (github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'master' || github.base_ref == 'development')))
+    needs: [detect, js-lint, security, js-test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - name: Assert committed native dirs for Expo
+        env:
+          BUILD_SYSTEM: ${{ needs.detect.outputs.build_system }}
+        run: bash .github/scripts/assert_expo_native_dirs.sh "$BUILD_SYSTEM"
+
+  # --- Bare + Expo (committed native): dev APK + dev IPA (PR = artifacts; push = Firebase). Manual dist: rn-firebase-release.yml ---
+
+  android-dev:
+    if: |
+      (github.event_name != 'workflow_dispatch' || inputs.run_internal_release_only == false) &&
+      (needs.detect.outputs.build_system == 'bare' || needs.detect.outputs.build_system == 'expo') &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/development')) ||
+       (github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'master' || github.base_ref == 'development')))
+    needs: [detect, js-lint, security, js-test, expo-native-dirs]
+    uses: ./.github/workflows/rn-job-android-firebase-release-bare.yml
+    with:
+      branch: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+      firebase_android_app: dev
+      gradle_task: assembleDevRelease
+      artifact_glob: app/build/outputs/apk/dev/release/*.apk
+      release_notes: ""
+      dry_run: false
+      upload_to_firebase: ${{ github.event_name == 'push' }}
+      firebase_groups: internal-qa
+    secrets: inherit
+
+  ios-dev:
+    if: |
+      (github.event_name != 'workflow_dispatch' || inputs.run_internal_release_only == false) &&
+      (needs.detect.outputs.build_system == 'bare' || needs.detect.outputs.build_system == 'expo') &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/development')) ||
+       (github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'master' || github.base_ref == 'development')))
+    needs: [detect, js-lint, security, js-test, expo-native-dirs]
+    uses: ./.github/workflows/rn-job-ios-firebase-release-bare.yml
+    with:
+      branch: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+      firebase_ios_app: dev
+      app_identifier: com.codeandtheory.templatepipelinetest.dev
+      ios_scheme: Dev
+      dry_run: false
+      upload_to_firebase: ${{ github.event_name == 'push' }}
+      firebase_groups: internal-qa
+      release_notes: ""
+    secrets: inherit

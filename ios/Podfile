@@ -1,0 +1,137 @@
+# Resolve react_native_pods.rb with node to allow for hoisting
+require Pod::Executable.execute_command('node', ['-p',
+  'require.resolve(
+    "react-native/scripts/react_native_pods.rb",
+    {paths: [process.argv[1]]},
+  )', __dir__]).strip
+
+require Pod::Executable.execute_command('node', ['-p',
+  'require.resolve(
+    "react-native-permissions/scripts/setup.rb",
+    {paths: [process.argv[1]]},
+  )', __dir__]).strip
+
+platform :ios, min_ios_version_supported
+prepare_react_native_project!
+
+setup_permissions([
+  'Camera',
+  'Microphone',
+  'LocationWhenInUse',
+  'PhotoLibrary',
+  'Contacts'
+])
+
+# Match Xcode build configuration names so CocoaPods generates the right xcfilelists per flavor.
+project 'TemplateBareApp.xcodeproj', {
+  'Debug' => :debug,
+  'Release' => :release,
+  'Debug-Dev' => :debug,
+  'Release-Dev' => :release,
+  'Debug-QA' => :debug,
+  'Release-QA' => :release,
+  'Debug-Prod' => :debug,
+  'Release-Prod' => :release,
+}
+
+linkage = ENV['USE_FRAMEWORKS']
+if linkage != nil
+  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
+  use_frameworks! :linkage => linkage.to_sym
+end
+
+target 'TemplateBareApp' do
+  $RNFirebaseAsStaticFramework = true
+  use_frameworks! :linkage => :static
+  config = use_native_modules!
+
+  use_react_native!(
+    :path => config[:reactNativePath],
+    # An absolute path to your application root.
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
+  )
+
+  target 'TemplateBareAppTests' do
+    inherit! :search_paths
+  end
+
+  post_install do |installer|
+    react_native_post_install(
+      installer,
+      config[:reactNativePath],
+      :mac_catalyst_enabled => false,
+      # :ccache_enabled => true
+    )
+
+    # react-native-mmkv → MMKVCore ships OpenSSL C++ under the pod; with modular
+    # headers / framework-module builds, Clang errors on non-modular includes.
+    installer.pods_project.targets.each do |target|
+      next unless target.name == 'MMKVCore'
+
+      target.build_configurations.each do |build_config|
+        build_config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+      end
+    end
+
+    # react-native-config iOS codegen reads ENV['ENVFILE'] or defaults to `.env` at repo root.
+    # App-target xcconfig ENVFILE does not propagate to the Pod build, so set it per configuration here.
+    installer.pods_project.targets.each do |target|
+      next unless target.name == 'react-native-config'
+
+      target.build_configurations.each do |build_config|
+        name = build_config.name
+        env_path = case name
+                   when 'Debug-Dev', 'Release-Dev'
+                     '$(PODS_ROOT)/../../.env.dev'
+                   when 'Debug-QA', 'Release-QA'
+                     '$(PODS_ROOT)/../../.env.qa'
+                   when 'Debug-Prod', 'Release-Prod'
+                     '$(PODS_ROOT)/../../.env.prod'
+                   else
+                     '$(PODS_ROOT)/../../.env.dev'
+                   end
+        build_config.build_settings['ENVFILE'] = env_path
+      end
+    end
+
+    installer.pods_project.targets.each do |target|
+      next unless target.name.start_with?('RNFB')
+    
+      target.build_configurations.each do |build_config|
+        build_config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+        # New Architecture / framework modules: without this Clang hides React RCT_* macros from RNFB Objective-C.
+        build_config.build_settings['CLANG_ENABLE_MODULES'] = 'NO'
+      end
+    end
+    
+    # RNFBApp references PhotoKit (PHAsset); link Photos on the host app target.
+    begin
+      require 'shellwords'
+      require 'xcodeproj'
+      Dir.glob(File.join(__dir__, '*.xcodeproj')).each do |project_path|
+        project = Xcodeproj::Project.open(project_path)
+        project.targets.each do |t|
+          next unless t.product_type == 'com.apple.product-type.application'
+          t.build_configurations.each do |config|
+            flags = config.build_settings['OTHER_LDFLAGS']
+            flags = case flags
+                    when NilClass then ['$(inherited)']
+                    when Array then flags.flatten
+                    else Shellwords.split(flags)
+                    end
+            joined = flags.join(' ')
+            next if joined.include?('Photos')
+            config.build_settings['OTHER_LDFLAGS'] = flags + ['-weak_framework', 'Photos']
+          end
+        end
+        project.save
+      end
+    rescue LoadError => e
+      Pod::UI.warn(
+        'Podfile: link Photos.framework for RNFB failed (' +
+          e.to_s +
+          '). Add to app target Other Linker Flags: -weak_framework Photos',
+      )
+    end
+  end
+end

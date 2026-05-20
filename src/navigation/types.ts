@@ -1,0 +1,48 @@
+import type { NavigatorScreenParams } from '@react-navigation/native';
+
+export type HomeStackParamList = {
+  HomeMain: undefined;
+  HomeDetail: { itemId: string; title?: string };
+};
+
+export type ExploreStackParamList = {
+  ExploreMain: undefined;
+  ExploreDetail: { section: string };
+};
+
+export type ProfileStackParamList = {
+  ProfileMain: undefined;
+  Settings: { from?: string } | undefined;
+};
+
+export type PostStackParamList = {
+  PostsMain: undefined;
+};
+
+export type MainTabParamList = {
+  HomeTab: NavigatorScreenParams<HomeStackParamList>;
+  ExploreTab: NavigatorScreenParams<ExploreStackParamList>;
+  ProfileTab: NavigatorScreenParams<ProfileStackParamList>;
+  PostsTab: NavigatorScreenParams<PostStackParamList>;
+};
+
+export type DrawerParamList = {
+  TabRoot: NavigatorScreenParams<MainTabParamList>;
+  About: undefined;
+  Settings: ProfileStackParamList['Settings'];
+  MediaPlayer: undefined,
+  AnalyticsDemo: undefined,
+  FeedbackCatalog: undefined;
+  RemoteConfig: undefined,
+  NotificationsCatalog: undefined;
+  CarouselCatalog: undefined;
+  PermissionsDemo: undefined;
+  CrashLoggerDemo: undefined,
+};
+
+export type RootStackParamList = {
+  Main: undefined;
+  ExampleModal: undefined;
+  TransparentModal: { message?: string } | undefined;
+  FullScreenModal: undefined;
+};

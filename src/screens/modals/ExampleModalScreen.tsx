@@ -1,0 +1,51 @@
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Pressable, Text, View } from 'react-native';
+
+import type { RootStackParamList } from '../../navigation/types';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+
+type Props = NativeStackScreenProps<RootStackParamList, 'ExampleModal'>;
+
+export function ExampleModalScreen({ navigation }: Props) {
+  const { t } = useTranslation();
+  const styles = useThemedStyles(colors => ({
+    container: {
+      flex: 1,
+      padding: 24,
+      justifyContent: 'center',
+      gap: 12,
+      backgroundColor: colors.background,
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: '700',
+      textAlign: 'center',
+      color: colors.text1,
+    },
+    caption: {
+      fontSize: 14,
+      opacity: 0.7,
+      textAlign: 'center',
+      color: colors.text2,
+    },
+    btn: {
+      backgroundColor: colors.primary,
+      paddingVertical: 14,
+      borderRadius: 8,
+      alignItems: 'center',
+    },
+    btnText: { color: colors.textOnPrimary, fontWeight: '600' },
+  }));
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>{t('exampleModal.title')}</Text>
+      <Text style={styles.caption}>{t('exampleModal.caption')}</Text>
+      <Pressable style={styles.btn} onPress={() => navigation.goBack()}>
+        <Text style={styles.btnText}>{t('exampleModal.dismiss')}</Text>
+      </Pressable>
+    </View>
+  );
+}

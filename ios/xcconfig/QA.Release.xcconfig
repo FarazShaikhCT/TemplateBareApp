@@ -1,0 +1,7 @@
+// QA flavor — Release build type
+#include? "../Pods/Target Support Files/Pods-TemplateBareApp/Pods-TemplateBareApp.release-qa.xcconfig"
+
+ENVFILE=../.env.qa
+
+PRODUCT_NAME = TemplateBareApp QA
+PRODUCT_BUNDLE_IDENTIFIER = com.codeandtheory.templatepipelinetest.qa

@@ -1,0 +1,10 @@
+// Dev flavor — Debug build type
+// Inherit CocoaPods settings, then apply flavor (PRODUCT_* must not be overridden in pbxproj for this config).
+#include? "../Pods/Target Support Files/Pods-TemplateBareApp/Pods-TemplateBareApp.debug-dev.xcconfig"
+
+// react-native-config reads ENVFILE to locate the .env file for this configuration.
+ENVFILE=../.env.dev
+
+// App display name and bundle ID suffix for the Dev flavor
+PRODUCT_NAME = TemplateBareApp Dev
+PRODUCT_BUNDLE_IDENTIFIER = com.codeandtheory.templatepipelinetest.dev

@@ -1,0 +1,7 @@
+// Dev flavor — Release build type
+#include? "../Pods/Target Support Files/Pods-TemplateBareApp/Pods-TemplateBareApp.release-dev.xcconfig"
+
+ENVFILE=../.env.dev
+
+PRODUCT_NAME = TemplateBareApp Dev
+PRODUCT_BUNDLE_IDENTIFIER = com.codeandtheory.templatepipelinetest.dev
