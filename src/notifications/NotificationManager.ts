@@ -105,7 +105,7 @@ class NotificationManagerClass {
         const data: PushNotificationData = {
           data: detail.notification.data as Record<string, string>,
         };
-          this.emitNotificationOpened(data);
+        this.emitNotificationOpened(data);
       }
     });
   }
@@ -130,7 +130,9 @@ class NotificationManagerClass {
     await messaging().requestPermission();
 
     const settings = await notifee.getNotificationSettings();
-    const status = this.mapNotifeeAuthorizationStatus(settings.authorizationStatus);
+    const status = this.mapNotifeeAuthorizationStatus(
+      settings.authorizationStatus,
+    );
 
     if (status === 'authorized' || status === 'provisional') {
       await messaging().registerDeviceForRemoteMessages();
@@ -172,7 +174,10 @@ class NotificationManagerClass {
 
     try {
       const permissionStatus = await this.checkPermission();
-      if (permissionStatus === 'authorized' || permissionStatus === 'provisional') {
+      if (
+        permissionStatus === 'authorized' ||
+        permissionStatus === 'provisional'
+      ) {
         const isRegistered = messaging().isDeviceRegisteredForRemoteMessages;
         if (!isRegistered) {
           await messaging().registerDeviceForRemoteMessages();
@@ -200,16 +205,28 @@ class NotificationManagerClass {
       importance: this.mapImportance(notification.android?.importance),
     };
 
-    if (notification.android?.largeIcon && typeof notification.android.largeIcon === 'string') {
+    if (
+      notification.android?.largeIcon &&
+      typeof notification.android.largeIcon === 'string'
+    ) {
       androidConfig.largeIcon = notification.android.largeIcon;
     }
-    if (notification.android?.color && typeof notification.android.color === 'string') {
+    if (
+      notification.android?.color &&
+      typeof notification.android.color === 'string'
+    ) {
       androidConfig.color = notification.android.color;
     }
-    if (notification.android?.sound && typeof notification.android.sound === 'string') {
+    if (
+      notification.android?.sound &&
+      typeof notification.android.sound === 'string'
+    ) {
       androidConfig.sound = notification.android.sound;
     }
-    if (notification.android?.actions && Array.isArray(notification.android.actions)) {
+    if (
+      notification.android?.actions &&
+      Array.isArray(notification.android.actions)
+    ) {
       androidConfig.actions = notification.android.actions;
     }
 
@@ -220,10 +237,16 @@ class NotificationManagerClass {
     if (notification.ios?.badge && typeof notification.ios.badge === 'number') {
       iosConfig.badgeCount = notification.ios.badge;
     }
-    if (notification.ios?.categoryId && typeof notification.ios.categoryId === 'string') {
+    if (
+      notification.ios?.categoryId &&
+      typeof notification.ios.categoryId === 'string'
+    ) {
       iosConfig.categoryId = notification.ios.categoryId;
     }
-    if (notification.ios?.attachments && Array.isArray(notification.ios.attachments)) {
+    if (
+      notification.ios?.attachments &&
+      Array.isArray(notification.ios.attachments)
+    ) {
       iosConfig.attachments = notification.ios.attachments;
     }
 
@@ -234,7 +257,11 @@ class NotificationManagerClass {
       ios: iosConfig,
     };
 
-    if (notification.id && typeof notification.id === 'string' && notification.id.trim().length > 0) {
+    if (
+      notification.id &&
+      typeof notification.id === 'string' &&
+      notification.id.trim().length > 0
+    ) {
       notificationPayload.id = notification.id.trim();
     }
 
@@ -242,16 +269,18 @@ class NotificationManagerClass {
       notificationPayload.data = notification.data;
     }
 
-    const notificationId = await notifee.displayNotification(notificationPayload);
+    const notificationId = await notifee.displayNotification(
+      notificationPayload,
+    );
 
     return notificationId;
   }
 
-  async scheduleNotification(
-    notification: LocalNotification,
-  ): Promise<string> {
+  async scheduleNotification(notification: LocalNotification): Promise<string> {
     if (!notification.schedule) {
-      throw new Error('Schedule configuration is required for scheduled notifications');
+      throw new Error(
+        'Schedule configuration is required for scheduled notifications',
+      );
     }
 
     await ensureAndroidExactAlarmsAllowedForTriggers();
@@ -282,7 +311,10 @@ class NotificationManagerClass {
     if (notification.ios?.sound && typeof notification.ios.sound === 'string') {
       iosConfig.sound = notification.ios.sound;
     }
-    if (notification.ios?.categoryId && typeof notification.ios.categoryId === 'string') {
+    if (
+      notification.ios?.categoryId &&
+      typeof notification.ios.categoryId === 'string'
+    ) {
       iosConfig.categoryId = notification.ios.categoryId;
     }
 

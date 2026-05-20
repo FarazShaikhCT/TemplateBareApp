@@ -51,8 +51,9 @@ export function AnalyticsDemoScreen() {
     <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
       <Text style={styles.title}>Analytics demo</Text>
       <Text style={styles.caption}>
-        Sends Firebase Analytics calls. Inspect Firebase DebugView or native logs to
-        verify delivery; this screen shows a short local confirmation after each tap.
+        Sends Firebase Analytics calls. Inspect Firebase DebugView or native
+        logs to verify delivery; this screen shows a short local confirmation
+        after each tap.
       </Text>
 
       <Pressable
@@ -70,7 +71,9 @@ export function AnalyticsDemoScreen() {
         accessibilityRole="button"
         accessibilityLabel="Log screen view for Analytics demo screen"
       >
-        <Text style={styles.btnText}>Log screen view (AnalyticsDemoScreen)</Text>
+        <Text style={styles.btnText}>
+          Log screen view (AnalyticsDemoScreen)
+        </Text>
       </Pressable>
 
       {lastAction ? <Text style={styles.status}>{lastAction}</Text> : null}

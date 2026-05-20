@@ -78,8 +78,8 @@ export function RemoteConfigScreen() {
     <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
       <Text style={styles.title}>Remote config</Text>
       <Text style={styles.caption}>
-        Uses Firebase Remote Config. Set the same keys in the Firebase console to
-        override defaults after fetch.
+        Uses Firebase Remote Config. Set the same keys in the Firebase console
+        to override defaults after fetch.
       </Text>
 
       <Pressable
@@ -111,11 +111,15 @@ export function RemoteConfigScreen() {
         <Text style={styles.value}>{demoMessage}</Text>
       </View>
       <View style={styles.row}>
-        <Text style={styles.label}>{REMOTE_CONFIG_KEYS.demoFeatureEnabled}</Text>
+        <Text style={styles.label}>
+          {REMOTE_CONFIG_KEYS.demoFeatureEnabled}
+        </Text>
         <Text style={styles.value}>{String(demoFeatureEnabled)}</Text>
       </View>
       <View style={styles.row}>
-        <Text style={styles.label}>{REMOTE_CONFIG_KEYS.demoRolloutPercent}</Text>
+        <Text style={styles.label}>
+          {REMOTE_CONFIG_KEYS.demoRolloutPercent}
+        </Text>
         <Text style={styles.value}>{String(demoRolloutPercent)}</Text>
       </View>
       <View style={styles.row}>

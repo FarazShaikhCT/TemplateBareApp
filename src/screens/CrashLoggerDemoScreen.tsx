@@ -2,7 +2,13 @@ import React, { useCallback, useState } from 'react';
 import { Pressable, ScrollView, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { crash, log, recordError, setCustomKey, setUserId } from '../crashLogger/crashLogger';
+import {
+  crash,
+  log,
+  recordError,
+  setCustomKey,
+  setUserId,
+} from '../crashLogger/crashLogger';
 import { BorderRadiusToken } from '../designSystem/generated/borderRadius';
 import { FontSizeToken } from '../designSystem/generated/fontSize';
 import { FontWeightToken } from '../designSystem/generated/fontWeight';
@@ -28,7 +34,10 @@ export function CrashLoggerDemoScreen() {
   const [lastAction, setLastAction] = useState<string | null>(null);
 
   const onRecordError = useCallback(async () => {
-    await recordError(new Error('Demo non-fatal error'), { screen: 'CrashLoggerDemoScreen', trigger: 'button' });
+    await recordError(new Error('Demo non-fatal error'), {
+      screen: 'CrashLoggerDemoScreen',
+      trigger: 'button',
+    });
     setLastAction('Recorded non-fatal error');
   }, []);
 
@@ -128,10 +137,11 @@ export function CrashLoggerDemoScreen() {
     <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
       <Text style={styles.title}>Crash Logger demo</Text>
       <Text style={styles.caption}>
-        Exercises the ICrashLoggerProvider abstraction (backed by Firebase Crashlytics).
-        Non-fatal actions appear in the Crashlytics dashboard within a few minutes.
-        Use "Throw JS error" to test the full pipeline in any build; use "Native crash"
-        only in a release build — it is a no-op in debug.
+        Exercises the ICrashLoggerProvider abstraction (backed by Firebase
+        Crashlytics). Non-fatal actions appear in the Crashlytics dashboard
+        within a few minutes. Use "Throw JS error" to test the full pipeline in
+        any build; use "Native crash" only in a release build — it is a no-op in
+        debug.
       </Text>
 
       <Text style={styles.sectionHeader}>Non-fatal reporting</Text>
@@ -203,7 +213,9 @@ export function CrashLoggerDemoScreen() {
         <Text style={styles.btnText}>Native crash (release builds only)</Text>
       </Pressable>
 
-      {lastAction ? <Text style={styles.status}>Last: {lastAction}</Text> : null}
+      {lastAction ? (
+        <Text style={styles.status}>Last: {lastAction}</Text>
+      ) : null}
     </ScrollView>
   );
 }

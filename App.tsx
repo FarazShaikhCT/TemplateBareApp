@@ -32,23 +32,23 @@ function App() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <BottomSheetModalProvider>
         <SafeAreaProvider>
-                <NotificationsProvider>
-                <FeedbackProvider>
-          <QueryProvider>
-            <AppThemeProvider>
-              <ConnectivityProvider>
-                <LoadingProvider>
-                  <AppRootErrorBoundary>
-                    <RemoteConfigProvider>
-                    <ThemedNavigationContainer />
-                    </RemoteConfigProvider>
-                  </AppRootErrorBoundary>
-                </LoadingProvider>
-              </ConnectivityProvider>
-            </AppThemeProvider>
-          </QueryProvider>
-          </FeedbackProvider>
-                </NotificationsProvider>
+          <NotificationsProvider>
+            <FeedbackProvider>
+              <QueryProvider>
+                <AppThemeProvider>
+                  <ConnectivityProvider>
+                    <LoadingProvider>
+                      <AppRootErrorBoundary>
+                        <RemoteConfigProvider>
+                          <ThemedNavigationContainer />
+                        </RemoteConfigProvider>
+                      </AppRootErrorBoundary>
+                    </LoadingProvider>
+                  </ConnectivityProvider>
+                </AppThemeProvider>
+              </QueryProvider>
+            </FeedbackProvider>
+          </NotificationsProvider>
         </SafeAreaProvider>
       </BottomSheetModalProvider>
     </GestureHandlerRootView>

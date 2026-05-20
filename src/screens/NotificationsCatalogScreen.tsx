@@ -193,113 +193,120 @@ export function NotificationsCatalogScreen() {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Permission Status</Text>
-        <View style={styles.statusCard}>
-          <Text style={styles.statusLabel}>Status:</Text>
-          <Text
-            style={[
-              styles.statusValue,
-              (permissionStatus === 'authorized' ||
-                permissionStatus === 'provisional') &&
-                styles.statusAuthorized,
-              permissionStatus === 'denied' && styles.statusDenied,
-            ]}
-          >
-            {permissionStatus}
-          </Text>
-        </View>
-        {permissionStatus !== 'authorized' && (
-          <Button title="Request Permission" onPress={handleRequestPermission} />
-        )}
-      </View>
-
-      {(permissionStatus === 'authorized' || permissionStatus === 'provisional') && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>FCM Token (Push Notifications)</Text>
-          {!fcmToken && (
+          <Text style={styles.sectionTitle}>Permission Status</Text>
+          <View style={styles.statusCard}>
+            <Text style={styles.statusLabel}>Status:</Text>
+            <Text
+              style={[
+                styles.statusValue,
+                (permissionStatus === 'authorized' ||
+                  permissionStatus === 'provisional') &&
+                  styles.statusAuthorized,
+                permissionStatus === 'denied' && styles.statusDenied,
+              ]}
+            >
+              {permissionStatus}
+            </Text>
+          </View>
+          {permissionStatus !== 'authorized' && (
             <Button
-              title="Get FCM Token"
-              onPress={loadFCMToken}
-              variant="secondary"
+              title="Request Permission"
+              onPress={handleRequestPermission}
             />
           )}
-          {fcmToken && (
-            <TouchableOpacity
-              style={styles.tokenCard}
-              onPress={onFcmTokenPress}
-            >
-              <Text style={styles.tokenText} numberOfLines={3}>
-                {fcmToken}
-              </Text>
-              <Text style={styles.tokenHint}>Tap to view full token</Text>
-            </TouchableOpacity>
-          )}
         </View>
-      )}
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Local Notifications</Text>
-        <Button
-          title="Simple Notification"
-          onPress={handleShowSimpleNotification}
-        />
-        <Button
-          title="High Priority Notification"
-          onPress={handleShowHighPriorityNotification}
-        />
-        <Button
-          title="Notification with Data"
-          onPress={handleShowNotificationWithData}
-        />
-      </View>
+        {(permissionStatus === 'authorized' ||
+          permissionStatus === 'provisional') && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>
+              FCM Token (Push Notifications)
+            </Text>
+            {!fcmToken && (
+              <Button
+                title="Get FCM Token"
+                onPress={loadFCMToken}
+                variant="secondary"
+              />
+            )}
+            {fcmToken && (
+              <TouchableOpacity
+                style={styles.tokenCard}
+                onPress={onFcmTokenPress}
+              >
+                <Text style={styles.tokenText} numberOfLines={3}>
+                  {fcmToken}
+                </Text>
+                <Text style={styles.tokenHint}>Tap to view full token</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Scheduled Notifications</Text>
-        <Button
-          title="Schedule in 10 Seconds"
-          onPress={handleScheduleNotification}
-        />
-        <Button
-          title="Schedule Daily at 9 AM"
-          onPress={handleScheduleDailyNotification}
-        />
-        <Button
-          title="Cancel All Scheduled"
-          onPress={handleCancelAllNotifications}
-          variant="secondary"
-        />
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Deep Link Testing</Text>
-        <Text style={styles.infoText}>
-          Schedule a notification that will navigate to Home screen when tapped.
-        </Text>
-        <Button
-          title="🔔 Schedule Test Deep Link (3s)"
-          onPress={handleScheduleDeepLinkNotification}
-        />
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.infoText}>
-          To test push notifications from a backend, use your Firebase Console to send a
-          message to this device's FCM token.
-        </Text>
-        <Text style={[styles.infoText, styles.infoTextSpacing]}>
-          {`To test deep links on iOS Simulator: Run \`xcrun simctl openurl booted ${deepLinkSchemePrefix}home\` in Terminal.`}
-        </Text>
-        <Text style={[styles.infoText, styles.infoTextSpacingSm]}>
-          {`To test deep links on Android: Run \`adb shell am start -W -a android.intent.action.VIEW -d "${deepLinkSchemePrefix}home" <your-application-id>\` in Terminal (use your app applicationId).`}
-        </Text>
-      </View>
-
-      {isLoading && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color={themeColors.primary} />
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Local Notifications</Text>
+          <Button
+            title="Simple Notification"
+            onPress={handleShowSimpleNotification}
+          />
+          <Button
+            title="High Priority Notification"
+            onPress={handleShowHighPriorityNotification}
+          />
+          <Button
+            title="Notification with Data"
+            onPress={handleShowNotificationWithData}
+          />
         </View>
-      )}
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Scheduled Notifications</Text>
+          <Button
+            title="Schedule in 10 Seconds"
+            onPress={handleScheduleNotification}
+          />
+          <Button
+            title="Schedule Daily at 9 AM"
+            onPress={handleScheduleDailyNotification}
+          />
+          <Button
+            title="Cancel All Scheduled"
+            onPress={handleCancelAllNotifications}
+            variant="secondary"
+          />
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Deep Link Testing</Text>
+          <Text style={styles.infoText}>
+            Schedule a notification that will navigate to Home screen when
+            tapped.
+          </Text>
+          <Button
+            title="🔔 Schedule Test Deep Link (3s)"
+            onPress={handleScheduleDeepLinkNotification}
+          />
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.infoText}>
+            To test push notifications from a backend, use your Firebase Console
+            to send a message to this device's FCM token.
+          </Text>
+          <Text style={[styles.infoText, styles.infoTextSpacing]}>
+            {`To test deep links on iOS Simulator: Run \`xcrun simctl openurl booted ${deepLinkSchemePrefix}home\` in Terminal.`}
+          </Text>
+          <Text style={[styles.infoText, styles.infoTextSpacingSm]}>
+            {`To test deep links on Android: Run \`adb shell am start -W -a android.intent.action.VIEW -d "${deepLinkSchemePrefix}home" <your-application-id>\` in Terminal (use your app applicationId).`}
+          </Text>
+        </View>
+
+        {isLoading && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="large" color={themeColors.primary} />
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );

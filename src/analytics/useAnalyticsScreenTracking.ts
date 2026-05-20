@@ -1,6 +1,6 @@
-import { useRef, useCallback } from "react";
-import type { NavigationContainerRef } from "@react-navigation/native";
-import { logScreenView } from "./analytics";
+import { useRef, useCallback } from 'react';
+import type { NavigationContainerRef } from '@react-navigation/native';
+import { logScreenView } from './analytics';
 
 /**
  * Hook that tracks screen views via Firebase Analytics.
