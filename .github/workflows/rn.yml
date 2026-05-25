@@ -136,7 +136,8 @@ jobs:
     with:
       # ── App identity ────────────────────────────────────────────────────────
       package:  "com.codeandtheory.templatepipelinetest.dev"
-      activity: "com.codeandtheory.templatepipelinetest.MainActivity"
+      # applicationId/fully-qualified activity (dev flavor uses .dev suffix on package)
+      activity: "com.codeandtheory.templatepipelinetest.dev/com.codeandtheory.templatepipelinetest.MainActivity"
 
       # ── APK — download from android-dev instead of rebuilding ───────────────
       # Artifact name pattern from rn-job-android-firebase-release-bare.yml line 69:
