@@ -1,0 +1,16 @@
+[
+  {
+    "timestamp": "2026-05-25T13:55:40Z",
+    "git_sha": "5fc932f461486b759a6bde13c0eacea0457b222e",
+    "branch": "2/merge",
+    "run_id": "26401769489",
+    "launch_time_ms": 2783.0,
+    "fps": 1.95,
+    "memory_mb": 216.61,
+    "cpu_spike_pct": 5.05,
+    "apk_size_mb": 78.93,
+    "memory_leak_mb_per_cycle": 0.007,
+    "api_latency_p95_ms": null,
+    "passed": false
+  }
+]
