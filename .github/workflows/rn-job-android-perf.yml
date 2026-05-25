@@ -1,20 +1,21 @@
 # Reusable Android performance workflow for React Native (bare) projects.
 #
-# Differences from a plain Android project:
-#   - Requires Node.js + npm install before Gradle (RN bundles JS at build time)
-#   - gradlew lives in android/ subdirectory, not the repo root
-#   - APK glob is android/app/build/outputs/apk/<flavor>/<buildType>/*.apk
-#   - Restores google-services.json before building (Firebase SDK in RN builds)
-#   - Defaults to devRelease (debug-signed release build, no extra keystore secrets)
+# APK source — two modes:
+#   Artifact mode (preferred):  pass apk_artifact_name → downloads APK uploaded by a prior build job
+#                               (e.g. the signed-apk-firebase-dev artifact from android-dev).
+#                               Skips all Gradle/Node/Java/Firebase steps. Zero redundant builds.
+#   Self-build mode (fallback): leave apk_artifact_name empty → builds the APK inline.
+#                               Useful for standalone runs or when no upstream build job exists.
 #
-# Caller example (rn.yml):
+# Caller example using artifact mode (rn.yml):
 #
 #   android-perf:
+#     needs: [android-dev]
+#     if: needs.android-dev.result == 'success'
 #     uses: ./.github/workflows/rn-job-android-perf.yml
 #     with:
-#       package:      "com.example.myapp.dev"
-#       gradle_task:  "assembleDevRelease"
-#       apk_glob:     "android/app/build/outputs/apk/dev/release/*.apk"
+#       package:            "com.example.myapp.dev"
+#       apk_artifact_name:  "signed-apk-firebase-dev-${{ github.run_number }}"
 #     secrets: inherit
 
 name: RN — Android performance (reusable)
@@ -42,7 +43,20 @@ on:
         default: ""
 
       # ------------------------------------------------------------------
-      # Build
+      # APK source
+      # ------------------------------------------------------------------
+      apk_artifact_name:
+        description: >
+          Name of an artifact uploaded by a prior job in this workflow run that contains
+          the APK (e.g. "signed-apk-firebase-dev-123"). When set, all Gradle build steps
+          are skipped and the APK is downloaded from the artifact store instead.
+          Leave empty to build the APK inline (self-build mode / standalone run).
+        required: false
+        type: string
+        default: ""
+
+      # ------------------------------------------------------------------
+      # Build (used only when apk_artifact_name is empty)
       # ------------------------------------------------------------------
       gradle_task:
         description: >
@@ -316,21 +330,35 @@ jobs:
             echo "No main baseline on perf-data yet — falling back to committed perf_baselines.json."
           fi
 
+      # ── Artifact mode: download APK uploaded by the upstream build job ────────
+      # Runs only when apk_artifact_name is supplied. All Gradle/Node/Java steps
+      # below are skipped in this mode, eliminating the redundant build.
+      - name: Download APK artifact
+        if: inputs.apk_artifact_name != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.apk_artifact_name }}
+          path: downloaded-apk
+
+      # ── Self-build mode: install toolchain and build the APK inline ──────────
+      # All steps in this section are skipped when apk_artifact_name is set.
+
       - name: Set up Node.js
-        if: inputs.setup_node
+        if: inputs.setup_node && inputs.apk_artifact_name == ''
         uses: actions/setup-node@v4
         with:
           node-version: ${{ inputs.node_version }}
           cache: npm
 
       - name: Set up JDK
-        if: inputs.setup_java
+        if: inputs.setup_java && inputs.apk_artifact_name == ''
         uses: actions/setup-java@v4
         with:
           java-version: ${{ inputs.java_version }}
           distribution: temurin
           cache: gradle
 
+      # Python is always needed (perf scripts run on the runner regardless of APK source).
       - name: Set up Python
         if: inputs.setup_python
         uses: actions/setup-python@v5
@@ -338,9 +366,8 @@ jobs:
           python-version: "3.11"
 
       # Restore google-services.json so the Firebase plugin in build.gradle does not fail.
-      # Skipped automatically when GOOGLE_SERVICES_JSON secret is empty.
       - name: Restore Firebase client config
-        if: inputs.firebase_flavor != ''
+        if: inputs.firebase_flavor != '' && inputs.apk_artifact_name == ''
         uses: ./.github/actions/restore-firebase-client-config
         with:
           firebase_flavor: ${{ inputs.firebase_flavor }}
@@ -350,20 +377,21 @@ jobs:
           GOOGLE_SERVICE_INFO_PLIST_DIST: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST_DIST }}
           GOOGLE_SERVICE_INFO_PLIST: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
 
-      # npm install is required before Gradle because the RN Gradle plugin calls
+      # npm install required before Gradle because the RN Gradle plugin calls
       # node_modules/.bin/react-native to bundle the JS at build time.
       - name: Install JS dependencies
+        if: inputs.apk_artifact_name == ''
         run: bash .github/scripts/install_js_deps.sh auto
 
-      # Install Android SDK via action (cloud runners). Self-hosted Mac runners
-      # already have the SDK from Android Studio — skip with setup_android_sdk: false.
+      # Install Android SDK via action (cloud runners only).
       - name: Set up Android SDK (cloud runners)
-        if: inputs.setup_android_sdk
+        if: inputs.setup_android_sdk && inputs.apk_artifact_name == ''
         uses: android-actions/setup-android@v3
 
       # Gradle requires sdk.dir in local.properties. Self-hosted Mac runners often
       # run as a service without ANDROID_HOME in the environment, so we auto-detect.
       - name: Configure Android SDK for Gradle
+        if: inputs.apk_artifact_name == ''
         shell: bash
         run: |
           set -euo pipefail
@@ -395,6 +423,7 @@ jobs:
           printf 'sdk.dir=%s\n' "$SDK" > "$GITHUB_WORKSPACE/${{ inputs.gradle_project_dir }}/local.properties"
 
       - name: Cache Gradle
+        if: inputs.apk_artifact_name == ''
         uses: actions/cache@v4
         with:
           path: |
@@ -404,18 +433,28 @@ jobs:
           restore-keys: gradle-perf-${{ runner.os }}-
 
       - name: Build APK
+        if: inputs.apk_artifact_name == ''
         working-directory: ${{ inputs.gradle_project_dir }}
         run: |
           chmod +x gradlew
           ./gradlew ${{ inputs.gradle_task }} --no-daemon
 
+      # ── Resolve APK path (both modes) ────────────────────────────────────────
       - name: Resolve APK path
         id: apk
         run: |
-          APK_PATH=$(ls ${{ inputs.apk_glob }} 2>/dev/null | head -n 1)
-          if [ -z "$APK_PATH" ]; then
-            echo "::error::No APK matched glob '${{ inputs.apk_glob }}'" >&2
-            exit 1
+          if [ -n "${{ inputs.apk_artifact_name }}" ]; then
+            APK_PATH=$(ls downloaded-apk/*.apk 2>/dev/null | head -n 1)
+            if [ -z "$APK_PATH" ]; then
+              echo "::error::No .apk found in downloaded-apk/ — artifact '${{ inputs.apk_artifact_name }}' may be empty or missing." >&2
+              exit 1
+            fi
+          else
+            APK_PATH=$(ls ${{ inputs.apk_glob }} 2>/dev/null | head -n 1)
+            if [ -z "$APK_PATH" ]; then
+              echo "::error::No APK matched glob '${{ inputs.apk_glob }}'" >&2
+              exit 1
+            fi
           fi
           echo "Resolved APK: $APK_PATH"
           echo "path=$APK_PATH" >> "$GITHUB_OUTPUT"

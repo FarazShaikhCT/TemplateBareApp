@@ -109,9 +109,10 @@ jobs:
     secrets: inherit
 
   # ── Android performance gate ──────────────────────────────────────────────
-  # Runs on every PR to main/master/development and every push to those branches.
-  # Builds devRelease APK (debug-signed, no extra keystore secrets needed),
-  # boots a local emulator on a self-hosted Mac runner, and gates 7 metrics:
+  # Waits for android-dev to finish, then downloads its signed APK artifact
+  # instead of running a second Gradle build. Zero redundant compilation.
+  #
+  # Gates 7 metrics on a self-hosted Mac emulator:
   #   launch_time, fps, memory, cpu_spike, cpu_time, apk_size, memory_leak
   #
   # ── One-time self-hosted runner setup ─────────────────────────────────────
@@ -124,12 +125,10 @@ jobs:
   # 4. Start: ./svc.sh install && ./svc.sh start
   #
   # ── Cloud fallback (when no self-hosted Mac is available) ─────────────────
-  # Comment out the self-hosted block below, uncomment the cloud block.
+  # Comment out the self-hosted block, uncomment the cloud block.
   android-perf:
-    if: |
-      (github.event_name != 'workflow_dispatch' || inputs.run_internal_release_only == false) &&
-      (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/development')) ||
-      (github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'master' || github.base_ref == 'development'))
+    needs: [android-dev]
+    if: needs.android-dev.result == 'success'
     uses: ./.github/workflows/rn-job-android-perf.yml
     permissions:
       contents: write
@@ -139,14 +138,12 @@ jobs:
       package:  "com.codeandtheory.templatepipelinetest.dev"
       activity: "com.codeandtheory.templatepipelinetest.MainActivity"
 
-      # ── Build — devRelease uses debug signing config, no keystore secrets ───
-      gradle_task: "assembleDevRelease"
-      apk_glob:    "android/app/build/outputs/apk/dev/release/*.apk"
+      # ── APK — download from android-dev instead of rebuilding ───────────────
+      # Artifact name pattern from rn-job-android-firebase-release-bare.yml line 69:
+      #   signed-apk-firebase-<firebase_android_app>-<run_number>
+      apk_artifact_name: "signed-apk-firebase-dev-${{ github.run_number }}"
 
       # ── Runner — self-hosted Mac (no cloud minutes, hardware GPU) ────────────
-      # Register: Repo → Settings → Actions → Runners → New self-hosted runner (macOS).
-      # The workflow auto-detects ~/Library/Android/sdk. Override android_sdk_path
-      # only if your SDK lives somewhere else.
       runner:              "self-hosted"
       emulator_arch:       "arm64-v8a"
       emulator_gpu:        "auto"
@@ -167,7 +164,6 @@ jobs:
       # job_timeout_minutes: 25
 
       # ── Gates ────────────────────────────────────────────────────────────────
-      # Thresholds are loose by design for a React Native emulator run.
       # After the first successful run on main the CI auto-switches to
       # baseline-comparison mode (25% tolerance) stored on the perf-data branch.
       baselines_path:           "scripts/perf/perf_baselines.json"
