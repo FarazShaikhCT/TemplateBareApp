@@ -144,6 +144,11 @@ jobs:
       #   signed-apk-firebase-<firebase_android_app>-<run_number>
       apk_artifact_name: "signed-apk-firebase-dev-${{ github.run_number }}"
 
+      # ── FPS target: PostsScreen FlatList (needs API_BASE_URL in dev APK) ─────
+      # android-dev copies .github/env.dev.ci → .env.dev when missing (JSONPlaceholder).
+      deep_link:            "templatebareapp://posts"
+      perf_settle_seconds:  12
+
       # ── Runner — self-hosted Mac (no cloud minutes, hardware GPU) ────────────
       runner:              "self-hosted"
       emulator_arch:       "arm64-v8a"

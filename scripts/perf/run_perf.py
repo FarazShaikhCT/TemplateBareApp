@@ -177,6 +177,16 @@ def resolve_launcher_activity(serial: Optional[str], pkg: str) -> str:
     return f"{pkg}/.MainActivity"
 
 
+def open_deep_link(serial: Optional[str], pkg: str, url: str) -> None:
+    """Open a deep link (React Navigation linking) for the installed package."""
+    adb_shell(
+        serial,
+        f'am start -W -a android.intent.action.VIEW -d "{url}" {pkg}',
+        check=False,
+        timeout=30,
+    )
+
+
 def wait_for_pid(serial: Optional[str], pkg: str, timeout_s: float = 10.0) -> int:
     """Poll pidof until the package is up; raise if it never starts."""
     deadline = time.monotonic() + timeout_s
@@ -870,6 +880,10 @@ def write_reports(out_dir: str, results: List[MetricResult], context: dict, perf
         f"- Device: `{context.get('device') or 'auto'}`",
         f"- Runs: {context['runs']}",
         f"- Scroll seconds: {context['scroll_seconds']}",
+    ]
+    if context.get("deep_link"):
+        lines.append(f"- Deep link: `{context['deep_link']}` (settle {context.get('perf_settle_seconds', 0)}s)")
+    lines += [
         "",
         "| Metric | Value | Threshold | Result |",
         "| --- | --- | --- | --- |",
@@ -930,6 +944,20 @@ def parse_args() -> argparse.Namespace:
             "Not recommended — animations inflate FPS/jank numbers. "
             "Omit this flag to let the agent disable and auto-restore animations."
         ),
+    )
+    parser.add_argument(
+        "--deep-link",
+        default=None,
+        help=(
+            "Deep link URL to open before FPS/CPU measurement (e.g. templatebareapp://posts). "
+            "Use with --perf-settle-seconds so network + FlatList can load."
+        ),
+    )
+    parser.add_argument(
+        "--perf-settle-seconds",
+        type=float,
+        default=10.0,
+        help="Seconds to wait after --deep-link before measuring FPS (API + list render).",
     )
     return parser.parse_args()
 
@@ -995,6 +1023,14 @@ def main() -> int:
         pid = wait_for_pid(serial, args.package)
         time.sleep(DEFAULT_STEADY_STATE_DELAY_S)
 
+        if args.deep_link:
+            print(f"[perf] Opening deep link: {args.deep_link}")
+            open_deep_link(serial, args.package, args.deep_link)
+            settle = max(args.perf_settle_seconds, 0.0)
+            if settle > 0:
+                print(f"[perf] Waiting {settle}s for screen settle (API / FlatList) ...")
+                time.sleep(settle)
+
         print("[perf] Measuring FPS / jank ...")
         fps = measure_fps(serial, args.package, args.scroll_seconds)
         fps_src = fps.get("fps_source", "gfxinfo")
@@ -1044,6 +1080,8 @@ def main() -> int:
             "leak_cycles": args.leak_cycles,
             "animations_disabled": args.disable_animations,
             "am_extras": am_extras or None,
+            "deep_link": args.deep_link,
+            "perf_settle_seconds": args.perf_settle_seconds if args.deep_link else None,
             "gate_mode": gate_mode,
             "gate_config": gate_config,
         }

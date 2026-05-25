@@ -256,6 +256,20 @@ on:
         type: string
         default: ""
 
+      deep_link:
+        description: >
+          Deep link opened before FPS measurement (e.g. templatebareapp://posts).
+          Requires API_BASE_URL baked into the APK (see .github/env.dev.ci).
+        required: false
+        type: string
+        default: ""
+
+      perf_settle_seconds:
+        description: "Seconds to wait after deep link for API + FlatList render before FPS scroll"
+        required: false
+        type: number
+        default: 10
+
       # ------------------------------------------------------------------
       # Regression detection
       # ------------------------------------------------------------------
@@ -304,6 +318,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Ensure react-native-config env (self-build only)
+        if: inputs.apk_artifact_name == ''
+        run: bash .github/scripts/ensure_react_native_config_env.sh dev
 
       # Last successful perf run on main stores its report as main-perf-baseline.json
       # on the perf-data branch. PRs (and main self-check) gate and compare against it.
@@ -499,6 +517,10 @@ jobs:
           fi
           if [ -n "${{ inputs.am_start_extras }}" ]; then
             FLAGS="$FLAGS ${{ inputs.am_start_extras }}"
+          fi
+          if [ -n "${{ inputs.deep_link }}" ]; then
+            FLAGS="$FLAGS --deep-link ${{ inputs.deep_link }}"
+            FLAGS="$FLAGS --perf-settle-seconds ${{ inputs.perf_settle_seconds }}"
           fi
           echo "value=$FLAGS" >> "$GITHUB_OUTPUT"
 
