@@ -81,9 +81,10 @@ XCB_COMMON=(
 if [[ -n "${PREBUILT_SIM_APP}" && -d "${PREBUILT_SIM_APP}" ]]; then
   echo "Using prebuilt simulator app from ios-dev: ${PREBUILT_SIM_APP}"
   PRODUCTS_DIR="${BUILD_DIR}/DerivedData/Build/Products/${IOS_BUILD_CONFIGURATION}-iphonesimulator"
+  APP_BUNDLE_NAME="$(basename "${PREBUILT_SIM_APP}")"
   mkdir -p "${PRODUCTS_DIR}"
-  rm -rf "${PRODUCTS_DIR}/${IOS_SCHEME}.app"
-  cp -R "${PREBUILT_SIM_APP}" "${PRODUCTS_DIR}/${IOS_SCHEME}.app"
+  rm -rf "${PRODUCTS_DIR}/${APP_BUNDLE_NAME}"
+  cp -R "${PREBUILT_SIM_APP}" "${PRODUCTS_DIR}/${APP_BUNDLE_NAME}"
 
   xcodebuild build-for-testing \
     "${XCB_COMMON[@]}" \

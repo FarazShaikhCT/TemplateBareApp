@@ -75,19 +75,23 @@ jobs:
         id: prebuilt_app
         run: |
           set -euo pipefail
-          APP_NAME="${IOS_SCHEME}.app"
-          if [[ -d "${GITHUB_WORKSPACE}/${APP_NAME}" ]]; then
-            echo "path=${GITHUB_WORKSPACE}/${APP_NAME}" >> "$GITHUB_OUTPUT"
-          elif [[ -d "${GITHUB_WORKSPACE}/build/prebuilt-sim/${APP_NAME}" ]]; then
-            echo "path=${GITHUB_WORKSPACE}/build/prebuilt-sim/${APP_NAME}" >> "$GITHUB_OUTPUT"
-          else
-            FOUND=$(find "${GITHUB_WORKSPACE}" -maxdepth 3 -name "${APP_NAME}" -type d | head -1)
-            if [[ -z "${FOUND}" ]]; then
-              echo "::error::Downloaded artifact did not contain ${APP_NAME}"
-              exit 1
-            fi
-            echo "path=${FOUND}" >> "$GITHUB_OUTPUT"
+          shopt -s nullglob
+          apps=()
+          while IFS= read -r -d '' app; do
+            base=$(basename "$app")
+            [[ "$base" == *UITests* ]] && continue
+            apps+=("$app")
+          done < <(find "${GITHUB_WORKSPACE}" -maxdepth 4 -type d -name '*.app' -print0 2>/dev/null)
+          if [[ ${#apps[@]} -eq 0 ]]; then
+            echo "::error::Downloaded ios-dev simulator artifact did not contain a .app bundle"
+            find "${GITHUB_WORKSPACE}" -maxdepth 4 -type d 2>/dev/null | head -40 || true
+            exit 1
           fi
+          if [[ ${#apps[@]} -gt 1 ]]; then
+            echo "::warning::Multiple .app bundles; using ${apps[0]}"
+          fi
+          echo "path=${apps[0]}" >> "$GITHUB_OUTPUT"
+          echo "Resolved prebuilt app: ${apps[0]}"
 
       - name: Restore Firebase client config
         uses: ./.github/actions/restore-firebase-client-config

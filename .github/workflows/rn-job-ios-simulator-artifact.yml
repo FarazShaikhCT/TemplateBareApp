@@ -76,8 +76,11 @@ jobs:
             -destination "$DEST" -derivedDataPath "$DD" \
             CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO \
             "PRODUCT_BUNDLE_IDENTIFIER=${PRODUCT_BUNDLE_IDENTIFIER}"
+          chmod +x .github/scripts/ios_find_simulator_app.sh
+          APP_PATH="$(.github/scripts/ios_find_simulator_app.sh "$DD" "$BC")"
+          echo "app_path=$APP_PATH" >> "$GITHUB_ENV"
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.artifact_name }}
-          path: DerivedDataCI/Build/Products/${{ inputs.ios_build_configuration }}-iphonesimulator/${{ inputs.ios_scheme }}.app
+          path: ${{ env.app_path }}
           if-no-files-found: error

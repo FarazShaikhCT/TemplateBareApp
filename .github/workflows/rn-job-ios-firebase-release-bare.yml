@@ -224,12 +224,10 @@ jobs:
             -destination "$DEST" -derivedDataPath "$DD" \
             CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO \
             "PRODUCT_BUNDLE_IDENTIFIER=${PRODUCT_BUNDLE_IDENTIFIER}"
-          APP_PATH="$DD/Build/Products/${BC}-iphonesimulator/${SC}.app"
-          if [[ ! -d "$APP_PATH" ]]; then
-            echo "::error::Simulator .app not found at $APP_PATH"
-            exit 1
-          fi
+          chmod +x .github/scripts/ios_find_simulator_app.sh
+          APP_PATH="$(.github/scripts/ios_find_simulator_app.sh "$DD" "$BC")"
           echo "app_path=$APP_PATH" >> "$GITHUB_OUTPUT"
+          echo "Resolved simulator app: $APP_PATH"
       - name: Upload simulator .app artifact
         if: ${{ inputs.firebase_ios_app == 'dev' }}
         uses: actions/upload-artifact@v4
