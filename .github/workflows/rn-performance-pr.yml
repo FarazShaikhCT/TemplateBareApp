@@ -1,30 +1,33 @@
-name: RN Performance (PR)
+# iOS UI performance on PRs is run from the main orchestrator (rn.yml → ios-performance after ios-dev).
+# This file is kept for manual re-runs only.
+
+name: RN Performance (PR) — manual
 
 on:
-  pull_request:
-    branches: [main, master, development]
-    paths:
-      - "ios/**"
-      - "src/**"
-      - "index.js"
-      - "package.json"
-      - "package-lock.json"
-      - "ci/**"
-      - ".github/scripts/ci_run_ios_ui_performance_tests.sh"
-      - ".github/scripts/extract_performance_metrics.py"
-      - ".github/scripts/compare_performance.py"
-      - ".github/scripts/update_performance_history.py"
-      - ".github/workflows/rn-performance-pr.yml"
-      - ".github/workflows/rn-job-ios-performance.yml"
-      - ".github/workflows/rn-performance-baseline.yml"
+  workflow_dispatch:
+    inputs:
+      perf_metrics_mode:
+        description: full (launch + CPU/memory) or launch (smoke)
+        type: choice
+        options: [full, launch]
+        default: full
+      ios_dev_simulator_artifact_name:
+        description: Optional ios-dev-simulator-* artifact name (leave empty to build app in-job)
+        type: string
+        default: ""
 
-concurrency:
-  group: rn-performance-pr-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   ui-performance:
     uses: ./.github/workflows/rn-job-ios-performance.yml
     with:
-      perf_metrics_mode: full
+      perf_metrics_mode: ${{ inputs.perf_metrics_mode }}
+      ios_dev_simulator_artifact_name: ${{ inputs.ios_dev_simulator_artifact_name }}
+      pr_number: ${{ github.event_name == 'pull_request' && github.event.pull_request.number || '' }}
+    permissions:
+      contents: read
+      pull-requests: write
     secrets: inherit

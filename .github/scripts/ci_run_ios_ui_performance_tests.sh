@@ -11,7 +11,9 @@ mkdir -p "${BUILD_DIR}"
 
 IOS_WORKSPACE="${IOS_WORKSPACE:-ios/TemplateBareApp.xcworkspace}"
 IOS_SCHEME="${IOS_SCHEME:-Dev}"
+IOS_BUILD_CONFIGURATION="${IOS_BUILD_CONFIGURATION:-Debug-Dev}"
 IOS_PERFORMANCE_TEST_CLASS="${IOS_PERFORMANCE_TEST_CLASS:-TemplateBareAppUITests/AppPerformanceTests}"
+PREBUILT_SIM_APP="${PREBUILT_SIM_APP:-}"
 
 # full = launch + CPU/memory (PR table like PerformanceTest_iOS). launch = fast local smoke.
 PERF_METRICS_MODE="${PERF_METRICS_MODE:-full}"
@@ -62,18 +64,42 @@ if [[ "${PERF_METRICS_MODE}" == "launch" ]]; then
   RETRY_FLAG=(-retry-tests-on-failure)
 fi
 
-xcodebuild test \
-  -workspace "${IOS_WORKSPACE}" \
-  -scheme "${IOS_SCHEME}" \
-  -sdk iphonesimulator \
-  -destination "${DESTINATION}" \
-  -derivedDataPath "${BUILD_DIR}/DerivedData" \
-  -only-testing:"${IOS_PERFORMANCE_ONLY_TEST}" \
-  -resultBundlePath "${BUILD_DIR}/TestResults.xcresult" \
-  -parallel-testing-enabled NO \
-  -maximum-concurrent-test-simulator-destinations 1 \
-  "${RETRY_FLAG[@]}" \
-  CODE_SIGN_IDENTITY=- \
-  CODE_SIGNING_REQUIRED=NO \
-  CODE_SIGNING_ALLOWED=YES \
-  2>&1 | tee "${BUILD_DIR}/xcodebuild-test.log"
+XCB_COMMON=(
+  -workspace "${IOS_WORKSPACE}"
+  -scheme "${IOS_SCHEME}"
+  -sdk iphonesimulator
+  -destination "${DESTINATION}"
+  -derivedDataPath "${BUILD_DIR}/DerivedData"
+  -only-testing:"${IOS_PERFORMANCE_ONLY_TEST}"
+  -parallel-testing-enabled NO
+  -maximum-concurrent-test-simulator-destinations 1
+  CODE_SIGN_IDENTITY=-
+  CODE_SIGNING_REQUIRED=NO
+  CODE_SIGNING_ALLOWED=YES
+)
+
+if [[ -n "${PREBUILT_SIM_APP}" && -d "${PREBUILT_SIM_APP}" ]]; then
+  echo "Using prebuilt simulator app from ios-dev: ${PREBUILT_SIM_APP}"
+  PRODUCTS_DIR="${BUILD_DIR}/DerivedData/Build/Products/${IOS_BUILD_CONFIGURATION}-iphonesimulator"
+  mkdir -p "${PRODUCTS_DIR}"
+  rm -rf "${PRODUCTS_DIR}/${IOS_SCHEME}.app"
+  cp -R "${PREBUILT_SIM_APP}" "${PRODUCTS_DIR}/${IOS_SCHEME}.app"
+
+  xcodebuild build-for-testing \
+    "${XCB_COMMON[@]}" \
+    -configuration "${IOS_BUILD_CONFIGURATION}" \
+    2>&1 | tee "${BUILD_DIR}/xcodebuild-test.log"
+
+  xcodebuild test-without-building \
+    "${XCB_COMMON[@]}" \
+    -configuration "${IOS_BUILD_CONFIGURATION}" \
+    -resultBundlePath "${BUILD_DIR}/TestResults.xcresult" \
+    "${RETRY_FLAG[@]}" \
+    2>&1 | tee -a "${BUILD_DIR}/xcodebuild-test.log"
+else
+  xcodebuild test \
+    "${XCB_COMMON[@]}" \
+    -resultBundlePath "${BUILD_DIR}/TestResults.xcresult" \
+    "${RETRY_FLAG[@]}" \
+    2>&1 | tee "${BUILD_DIR}/xcodebuild-test.log"
+fi
