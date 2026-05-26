@@ -9,6 +9,10 @@ ROOT="${GITHUB_WORKSPACE:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 BUILD_DIR="${ROOT}/build"
 mkdir -p "${BUILD_DIR}"
 
+if [[ -x "${ROOT}/.github/scripts/restore_ci_env_files.sh" ]]; then
+  bash "${ROOT}/.github/scripts/restore_ci_env_files.sh"
+fi
+
 IOS_WORKSPACE="${IOS_WORKSPACE:-ios/TemplateBareApp.xcworkspace}"
 IOS_SCHEME="${IOS_SCHEME:-Dev}"
 IOS_BUILD_CONFIGURATION="${IOS_BUILD_CONFIGURATION:-Debug-Dev}"
@@ -72,6 +76,7 @@ xcodebuild test \
   -destination "${DESTINATION}" \
   -derivedDataPath "${BUILD_DIR}/DerivedData" \
   -only-testing:"${IOS_PERFORMANCE_ONLY_TEST}" \
+  -skip-testing:TemplateBareAppTests \
   -resultBundlePath "${BUILD_DIR}/TestResults.xcresult" \
   -parallel-testing-enabled NO \
   -maximum-concurrent-test-simulator-destinations 1 \
@@ -79,6 +84,7 @@ xcodebuild test \
   CODE_SIGN_IDENTITY=- \
   CODE_SIGNING_REQUIRED=NO \
   CODE_SIGNING_ALLOWED=YES \
+  FORCE_BUNDLING=1 \
   2>&1 | tee "${BUILD_DIR}/xcodebuild-test.log"
 XCODE_EXIT="${PIPESTATUS[0]}"
 set -e

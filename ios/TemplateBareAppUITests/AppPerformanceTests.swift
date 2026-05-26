@@ -10,16 +10,23 @@ import XCTest
 final class AppPerformanceTests: XCTestCase {
 
     private let expectedHomeTitle = "Home stack"
+    private let useBundledJsLaunchArgument = "-UseBundledJS"
+
+    private func configuredApp() -> XCUIApplication {
+        let app = XCUIApplication()
+        app.launchArguments.append(useBundledJsLaunchArgument)
+        return app
+    }
 
     func testLaunchPerformance() {
-        let app = XCUIApplication()
+        let app = configuredApp()
         measure(metrics: [XCTApplicationLaunchMetric()]) {
             app.launch()
         }
     }
 
     func testTypicalSessionCPUAndMemory() throws {
-        let app = XCUIApplication()
+        let app = configuredApp()
         app.launch()
         XCTAssertTrue(
             waitForAppReady(app, timeout: 90),
