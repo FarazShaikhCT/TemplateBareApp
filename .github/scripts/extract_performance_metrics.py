@@ -294,7 +294,17 @@ def main() -> None:
 
     if not args.xcresult.exists():
         sys.stderr.write(f"Missing xcresult: {args.xcresult}\n")
-        sys.exit(2)
+        empty = {
+            "schemaVersion": 1,
+            "extractedAt": datetime.now(timezone.utc).isoformat(),
+            "metrics": {},
+            "rawPerformanceObjects": 0,
+            "logMetricKeys": 0,
+        }
+        args.out.parent.mkdir(parents=True, exist_ok=True)
+        args.out.write_text(json.dumps(empty, indent=2), encoding="utf-8")
+        print(f"Wrote empty metrics to {args.out} (no xcresult)")
+        return
 
     doc = extract_metrics(args.xcresult, args.xcodebuild_log)
     args.out.parent.mkdir(parents=True, exist_ok=True)

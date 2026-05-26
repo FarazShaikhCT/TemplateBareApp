@@ -1,5 +1,5 @@
 # iOS UI performance tests (XCTest metrics) + baseline comparison on PRs.
-# Invoked from rn.yml after ios-dev; reuses the simulator .app artifact from that job when provided.
+# Invoked from rn.yml after ios-dev (gates on successful dev IPA/simulator build).
 name: RN — iOS UI performance
 
 on:
@@ -26,14 +26,6 @@ on:
         type: string
         default: ""
         description: Optional override for -only-testing (empty = use perf_metrics_mode)
-      ios_dev_simulator_artifact_name:
-        type: string
-        default: ""
-        description: Artifact name from ios-dev (ios-dev-simulator-*). Empty = build app in this job.
-      workflow_run_id:
-        type: string
-        default: ""
-        description: Parent orchestrator run id (github.run_id from rn.yml) — required to download ios-dev artifacts from a nested reusable workflow.
       pr_number:
         type: string
         default: ""
@@ -61,31 +53,11 @@ jobs:
       IOS_BUILD_CONFIGURATION: ${{ inputs.ios_build_configuration }}
       SIMULATOR_DESTINATION: ${{ inputs.simulator_destination }}
       PERF_METRICS_MODE: ${{ inputs.perf_metrics_mode }}
-      IOS_DEV_SIMULATOR_ARTIFACT: ${{ inputs.ios_dev_simulator_artifact_name }}
       PR_NUMBER: ${{ inputs.pr_number }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Download ios-dev simulator .app
-        if: ${{ inputs.ios_dev_simulator_artifact_name != '' && inputs.workflow_run_id != '' }}
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ inputs.ios_dev_simulator_artifact_name }}
-          path: build/ios-dev-sim
-          run-id: ${{ inputs.workflow_run_id }}
-          github-token: ${{ github.token }}
-
-      - name: Resolve prebuilt simulator .app path
-        if: ${{ inputs.ios_dev_simulator_artifact_name != '' && inputs.workflow_run_id != '' }}
-        id: prebuilt_app
-        run: |
-          set -euo pipefail
-          chmod +x .github/scripts/ios_resolve_downloaded_sim_app.sh
-          APP_PATH="$(.github/scripts/ios_resolve_downloaded_sim_app.sh "${GITHUB_WORKSPACE}/build/ios-dev-sim")"
-          echo "path=${APP_PATH}" >> "$GITHUB_OUTPUT"
-          echo "Resolved prebuilt app: ${APP_PATH}"
 
       - name: Restore Firebase client config
         uses: ./.github/actions/restore-firebase-client-config
@@ -145,16 +117,21 @@ jobs:
       - name: Run UI performance tests
         id: perf_tests
         continue-on-error: true
-        env:
-          PREBUILT_SIM_APP: ${{ steps.prebuilt_app.outputs.path }}
         run: |
           chmod +x .github/scripts/ci_run_ios_ui_performance_tests.sh
           .github/scripts/ci_run_ios_ui_performance_tests.sh
 
       - name: Extract metrics JSON
         if: steps.perf_tests.outcome != 'cancelled'
+        continue-on-error: true
         working-directory: ${{ github.workspace }}
         run: |
+          set -euo pipefail
+          if [[ ! -d build/TestResults.xcresult ]]; then
+            echo "::warning::No TestResults.xcresult — writing empty metrics (xcodebuild likely failed)."
+            echo '{"schemaVersion":1,"metrics":{}}' > build/current-metrics.json
+            exit 0
+          fi
           python3 .github/scripts/extract_performance_metrics.py \
             --xcresult build/TestResults.xcresult \
             --xcodebuild-log build/xcodebuild-test.log \

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Runs iOS UI performance tests on a simulator (GitHub Actions macOS runners).
-# Exit code from xcodebuild is preserved (pipefail + tee).
+# Exit code from xcodebuild is preserved (pipefail + PIPESTATUS).
 #
 # Do not use CODE_SIGNING_ALLOWED=NO — it breaks embedding/running UI test bundles on many Xcode versions.
 set -euo pipefail
@@ -13,7 +13,6 @@ IOS_WORKSPACE="${IOS_WORKSPACE:-ios/TemplateBareApp.xcworkspace}"
 IOS_SCHEME="${IOS_SCHEME:-Dev}"
 IOS_BUILD_CONFIGURATION="${IOS_BUILD_CONFIGURATION:-Debug-Dev}"
 IOS_PERFORMANCE_TEST_CLASS="${IOS_PERFORMANCE_TEST_CLASS:-TemplateBareAppUITests/AppPerformanceTests}"
-PREBUILT_SIM_APP="${PREBUILT_SIM_APP:-}"
 
 # full = launch + CPU/memory (PR table like PerformanceTest_iOS). launch = fast local smoke.
 PERF_METRICS_MODE="${PERF_METRICS_MODE:-full}"
@@ -57,50 +56,35 @@ fi
 cd "${ROOT}"
 
 rm -rf "${BUILD_DIR}/TestResults.xcresult"
-echo "Running tests: ${IOS_PERFORMANCE_ONLY_TEST} (PERF_METRICS_MODE=${PERF_METRICS_MODE})"
+echo "Running tests: ${IOS_PERFORMANCE_ONLY_TEST} (PERF_METRICS_MODE=${PERF_METRICS_MODE}, configuration=${IOS_BUILD_CONFIGURATION})"
 
 RETRY_FLAG=()
 if [[ "${PERF_METRICS_MODE}" == "launch" ]]; then
   RETRY_FLAG=(-retry-tests-on-failure)
 fi
 
-XCB_COMMON=(
-  -workspace "${IOS_WORKSPACE}"
-  -scheme "${IOS_SCHEME}"
-  -sdk iphonesimulator
-  -destination "${DESTINATION}"
-  -derivedDataPath "${BUILD_DIR}/DerivedData"
-  -only-testing:"${IOS_PERFORMANCE_ONLY_TEST}"
-  -parallel-testing-enabled NO
-  -maximum-concurrent-test-simulator-destinations 1
-  CODE_SIGN_IDENTITY=-
-  CODE_SIGNING_REQUIRED=NO
-  CODE_SIGNING_ALLOWED=YES
-)
+set +e
+xcodebuild test \
+  -workspace "${IOS_WORKSPACE}" \
+  -scheme "${IOS_SCHEME}" \
+  -configuration "${IOS_BUILD_CONFIGURATION}" \
+  -sdk iphonesimulator \
+  -destination "${DESTINATION}" \
+  -derivedDataPath "${BUILD_DIR}/DerivedData" \
+  -only-testing:"${IOS_PERFORMANCE_ONLY_TEST}" \
+  -resultBundlePath "${BUILD_DIR}/TestResults.xcresult" \
+  -parallel-testing-enabled NO \
+  -maximum-concurrent-test-simulator-destinations 1 \
+  "${RETRY_FLAG[@]}" \
+  CODE_SIGN_IDENTITY=- \
+  CODE_SIGNING_REQUIRED=NO \
+  CODE_SIGNING_ALLOWED=YES \
+  2>&1 | tee "${BUILD_DIR}/xcodebuild-test.log"
+XCODE_EXIT="${PIPESTATUS[0]}"
+set -e
 
-if [[ -n "${PREBUILT_SIM_APP}" && -d "${PREBUILT_SIM_APP}" ]]; then
-  echo "Using prebuilt simulator app from ios-dev: ${PREBUILT_SIM_APP}"
-  PRODUCTS_DIR="${BUILD_DIR}/DerivedData/Build/Products/${IOS_BUILD_CONFIGURATION}-iphonesimulator"
-  APP_BUNDLE_NAME="$(basename "${PREBUILT_SIM_APP}")"
-  mkdir -p "${PRODUCTS_DIR}"
-  rm -rf "${PRODUCTS_DIR}/${APP_BUNDLE_NAME}"
-  cp -R "${PREBUILT_SIM_APP}" "${PRODUCTS_DIR}/${APP_BUNDLE_NAME}"
-
-  xcodebuild build-for-testing \
-    "${XCB_COMMON[@]}" \
-    -configuration "${IOS_BUILD_CONFIGURATION}" \
-    2>&1 | tee "${BUILD_DIR}/xcodebuild-test.log"
-
-  xcodebuild test-without-building \
-    "${XCB_COMMON[@]}" \
-    -configuration "${IOS_BUILD_CONFIGURATION}" \
-    -resultBundlePath "${BUILD_DIR}/TestResults.xcresult" \
-    "${RETRY_FLAG[@]}" \
-    2>&1 | tee -a "${BUILD_DIR}/xcodebuild-test.log"
-else
-  xcodebuild test \
-    "${XCB_COMMON[@]}" \
-    -resultBundlePath "${BUILD_DIR}/TestResults.xcresult" \
-    "${RETRY_FLAG[@]}" \
-    2>&1 | tee "${BUILD_DIR}/xcodebuild-test.log"
+if [[ "${XCODE_EXIT}" -ne 0 ]]; then
+  echo "::error::xcodebuild test failed with exit code ${XCODE_EXIT}"
+  tail -n 80 "${BUILD_DIR}/xcodebuild-test.log" || true
+  exit "${XCODE_EXIT}"
 fi

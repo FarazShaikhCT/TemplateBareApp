@@ -11,10 +11,6 @@ on:
         type: choice
         options: [full, launch]
         default: full
-      ios_dev_simulator_artifact_name:
-        description: Optional ios-dev-simulator-* artifact name (leave empty to build app in-job)
-        type: string
-        default: ""
 
 permissions:
   contents: read
@@ -25,8 +21,7 @@ jobs:
     uses: ./.github/workflows/rn-job-ios-performance.yml
     with:
       perf_metrics_mode: ${{ inputs.perf_metrics_mode }}
-      ios_dev_simulator_artifact_name: ${{ inputs.ios_dev_simulator_artifact_name }}
-      pr_number: ${{ github.event_name == 'pull_request' && github.event.pull_request.number || '' }}
+      pr_number: ''
     permissions:
       contents: read
       pull-requests: write
