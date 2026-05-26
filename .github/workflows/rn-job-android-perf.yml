@@ -558,6 +558,10 @@ jobs:
             adb install -r -t "${{ steps.apk.outputs.path }}"
             mkdir -p "${{ inputs.out_dir }}"
             python3 scripts/perf/run_perf.py ${{ steps.flags.outputs.value }}
+            # Explicitly shut down the emulator so android-emulator-runner exits
+            # immediately rather than hanging waiting for the process to die on its own.
+            adb emu kill || true
+            adb kill-server || true
 
       # Always runs so we get a report even when the emulator step fails.
       - name: Analyze performance + detect regressions
