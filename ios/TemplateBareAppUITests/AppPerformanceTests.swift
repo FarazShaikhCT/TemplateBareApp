@@ -1,0 +1,45 @@
+//
+//  AppPerformanceTests.swift
+//  TemplateBareAppUITests
+//
+
+import XCTest
+
+/// XCTest performance metrics recorded for CI (launch, CPU, memory).
+/// Home title must match `home.title` in src/third-party/i18n/locales/en/translation.json.
+final class AppPerformanceTests: XCTestCase {
+
+    private let expectedHomeTitle = "Home stack"
+
+    func testLaunchPerformance() {
+        let app = XCUIApplication()
+        measure(metrics: [XCTApplicationLaunchMetric()]) {
+            app.launch()
+        }
+    }
+
+    func testTypicalSessionCPUAndMemory() throws {
+        let app = XCUIApplication()
+        app.launch()
+        XCTAssertTrue(
+            waitForAppReady(app, timeout: 90),
+            "App UI did not appear — start Metro or use a Release build with bundled JS."
+        )
+
+        measure(metrics: [
+            XCTCPUMetric(application: app),
+            XCTMemoryMetric(application: app),
+        ]) {
+            _ = waitForAppReady(app, timeout: 10)
+        }
+    }
+
+    /// RN exposes Text as staticTexts; View accessibilityLabel alone is unreliable in XCUITest.
+    private func waitForAppReady(_ app: XCUIApplication, timeout: TimeInterval) -> Bool {
+        let homeTitle = app.staticTexts[expectedHomeTitle]
+        if homeTitle.waitForExistence(timeout: timeout) {
+            return true
+        }
+        return app.otherElements["app-root"].waitForExistence(timeout: 5)
+    }
+}

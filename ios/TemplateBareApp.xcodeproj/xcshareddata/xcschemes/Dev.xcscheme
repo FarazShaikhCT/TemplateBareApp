@@ -38,6 +38,16 @@
                ReferencedContainer = "container:TemplateBareApp.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "A1B2C3D81AD99517003FC87E"
+               BuildableName = "TemplateBareAppUITests.xctest"
+               BlueprintName = "TemplateBareAppUITests"
+               ReferencedContainer = "container:TemplateBareApp.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

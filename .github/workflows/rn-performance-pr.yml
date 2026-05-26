@@ -1,0 +1,30 @@
+name: RN Performance (PR)
+
+on:
+  pull_request:
+    branches: [main, master, development]
+    paths:
+      - "ios/**"
+      - "src/**"
+      - "index.js"
+      - "package.json"
+      - "package-lock.json"
+      - "ci/**"
+      - ".github/scripts/ci_run_ios_ui_performance_tests.sh"
+      - ".github/scripts/extract_performance_metrics.py"
+      - ".github/scripts/compare_performance.py"
+      - ".github/scripts/update_performance_history.py"
+      - ".github/workflows/rn-performance-pr.yml"
+      - ".github/workflows/rn-job-ios-performance.yml"
+      - ".github/workflows/rn-performance-baseline.yml"
+
+concurrency:
+  group: rn-performance-pr-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ui-performance:
+    uses: ./.github/workflows/rn-job-ios-performance.yml
+    with:
+      perf_metrics_mode: full
+    secrets: inherit
