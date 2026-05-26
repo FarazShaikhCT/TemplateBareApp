@@ -140,6 +140,7 @@ jobs:
     with:
       perf_metrics_mode: full
       ios_dev_simulator_artifact_name: ${{ needs.ios-dev.outputs.ios_dev_simulator_artifact_name }}
+      workflow_run_id: ${{ github.run_id }}
       pr_number: ${{ github.event_name == 'pull_request' && github.event.pull_request.number || '' }}
     permissions:
       contents: read

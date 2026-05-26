@@ -228,12 +228,19 @@ jobs:
           APP_PATH="$(.github/scripts/ios_find_simulator_app.sh "$DD" "$BC")"
           echo "app_path=$APP_PATH" >> "$GITHUB_OUTPUT"
           echo "Resolved simulator app: $APP_PATH"
+          STAGING="build/ios-dev-simulator-artifact"
+          rm -rf "${STAGING}"
+          mkdir -p "${STAGING}"
+          cp -R "${APP_PATH}" "${STAGING}/"
+          ditto -c -k --keepParent "${APP_PATH}" build/ios-dev-simulator-app.zip
       - name: Upload simulator .app artifact
         if: ${{ inputs.firebase_ios_app == 'dev' }}
         uses: actions/upload-artifact@v4
         with:
           name: ios-dev-simulator-${{ github.run_id }}
-          path: ${{ steps.sim_app_build.outputs.app_path }}
+          path: |
+            build/ios-dev-simulator-artifact
+            build/ios-dev-simulator-app.zip
           if-no-files-found: error
       - name: Set simulator artifact output
         if: ${{ inputs.firebase_ios_app == 'dev' }}

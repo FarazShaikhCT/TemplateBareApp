@@ -30,6 +30,10 @@ on:
         type: string
         default: ""
         description: Artifact name from ios-dev (ios-dev-simulator-*). Empty = build app in this job.
+      workflow_run_id:
+        type: string
+        default: ""
+        description: Parent orchestrator run id (github.run_id from rn.yml) — required to download ios-dev artifacts from a nested reusable workflow.
       pr_number:
         type: string
         default: ""
@@ -65,33 +69,23 @@ jobs:
           fetch-depth: 0
 
       - name: Download ios-dev simulator .app
-        if: ${{ inputs.ios_dev_simulator_artifact_name != '' }}
+        if: ${{ inputs.ios_dev_simulator_artifact_name != '' && inputs.workflow_run_id != '' }}
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.ios_dev_simulator_artifact_name }}
+          path: build/ios-dev-sim
+          run-id: ${{ inputs.workflow_run_id }}
+          github-token: ${{ github.token }}
 
       - name: Resolve prebuilt simulator .app path
-        if: ${{ inputs.ios_dev_simulator_artifact_name != '' }}
+        if: ${{ inputs.ios_dev_simulator_artifact_name != '' && inputs.workflow_run_id != '' }}
         id: prebuilt_app
         run: |
           set -euo pipefail
-          shopt -s nullglob
-          apps=()
-          while IFS= read -r -d '' app; do
-            base=$(basename "$app")
-            [[ "$base" == *UITests* ]] && continue
-            apps+=("$app")
-          done < <(find "${GITHUB_WORKSPACE}" -maxdepth 4 -type d -name '*.app' -print0 2>/dev/null)
-          if [[ ${#apps[@]} -eq 0 ]]; then
-            echo "::error::Downloaded ios-dev simulator artifact did not contain a .app bundle"
-            find "${GITHUB_WORKSPACE}" -maxdepth 4 -type d 2>/dev/null | head -40 || true
-            exit 1
-          fi
-          if [[ ${#apps[@]} -gt 1 ]]; then
-            echo "::warning::Multiple .app bundles; using ${apps[0]}"
-          fi
-          echo "path=${apps[0]}" >> "$GITHUB_OUTPUT"
-          echo "Resolved prebuilt app: ${apps[0]}"
+          chmod +x .github/scripts/ios_resolve_downloaded_sim_app.sh
+          APP_PATH="$(.github/scripts/ios_resolve_downloaded_sim_app.sh "${GITHUB_WORKSPACE}/build/ios-dev-sim")"
+          echo "path=${APP_PATH}" >> "$GITHUB_OUTPUT"
+          echo "Resolved prebuilt app: ${APP_PATH}"
 
       - name: Restore Firebase client config
         uses: ./.github/actions/restore-firebase-client-config
