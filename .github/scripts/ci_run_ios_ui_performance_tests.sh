@@ -64,26 +64,26 @@ elif [[ "${DESTINATION}" == *"platform=iOS Simulator"* ]]; then
   UDID="$(python3 "${ROOT}/.github/scripts/ios_first_iphone_sim_udid.py" --udid)"
 fi
 if [[ -n "${UDID:-}" ]]; then
-  echo "Booting simulator ${UDID}..."
+  echo "Preparing simulator ${UDID}..."
+  # Shutdown first so we always start from a clean state.
+  # Leftover state from a previous run or a crashed simulator causes
+  # bootstatus to return Status=4294967295 (-1) mid-wait.
+  xcrun simctl shutdown "${UDID}" 2>/dev/null || true
+  sleep 2
   xcrun simctl boot "${UDID}" 2>/dev/null || true
-  
-  # Wait for simulator boot with timeout (max 120 seconds)
-  echo "Waiting for simulator to boot..."
-  if ! timeout 120 xcrun simctl bootstatus "${UDID}" -b; then
-    echo "::error::Simulator failed to boot within 120 seconds"
-    xcrun simctl list devices
-    exit 1
+
+  # Wait up to 120 s for the simulator to reach Booted.
+  # On failure we warn and let xcodebuild attempt its own boot rather than
+  # aborting the job — a hard exit here is worse than handing off to xcodebuild.
+  echo "Waiting for simulator to reach Booted state..."
+  if ! timeout 120 xcrun simctl bootstatus "${UDID}" -b 2>&1; then
+    echo "::warning::simctl bootstatus reported a boot issue (Status=4294967295 or timeout) — xcodebuild will attempt to boot the simulator"
+    sleep 5
   fi
-  
-  # Verify simulator is actually booted
-  SIM_STATE=$(xcrun simctl list devices | grep -A1 "${UDID}" | grep -o "Booted\|Shutdown" || echo "Unknown")
-  echo "Simulator state: ${SIM_STATE}"
-  if [[ "${SIM_STATE}" != "Booted" ]]; then
-    echo "::warning::Simulator not in Booted state, attempting to continue anyway"
-  fi
-  
-  # Give the simulator a moment to stabilize
-  sleep 5
+
+  # Confirm final state for diagnostics.
+  SIM_STATE=$(xcrun simctl list devices | grep "${UDID}" | grep -o "Booted\|Shutdown\|Booting" || echo "Unknown")
+  echo "Simulator state after boot attempt: ${SIM_STATE}"
 fi
 
 cd "${ROOT}"

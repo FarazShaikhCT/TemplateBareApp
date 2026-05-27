@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import platform
 import re
 import subprocess
 import sys
@@ -81,7 +82,10 @@ def main() -> None:
         print(f"id={udid}")
         return
 
-    print(f"platform=iOS Simulator,name={name},OS={os_version}")
+    # Include arch so xcodebuild never warns about multiple matching destinations
+    # (arm64 and x86_64 share the same UDID on Apple-silicon runners).
+    arch = "arm64" if platform.machine() == "arm64" else "x86_64"
+    print(f"platform=iOS Simulator,name={name},OS={os_version},arch={arch}")
 
 
 if __name__ == "__main__":
