@@ -44,6 +44,7 @@ jobs:
   ui-performance:
     name: iOS UI performance vs baseline
     runs-on: macos-15
+    timeout-minutes: 45
     permissions:
       contents: read
       pull-requests: write
@@ -120,6 +121,7 @@ jobs:
       - name: Run UI performance tests
         id: perf_tests
         continue-on-error: true
+        timeout-minutes: 40
         run: |
           chmod +x .github/scripts/ci_run_ios_ui_performance_tests.sh
           .github/scripts/ci_run_ios_ui_performance_tests.sh
@@ -171,12 +173,22 @@ jobs:
           if-no-files-found: ignore
 
       - name: Upload xcodebuild log
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: performance-xcodebuild-log-${{ github.run_id }}
           path: build/xcodebuild-test.log
           if-no-files-found: ignore
+
+      - name: Capture simulator diagnostics on failure
+        if: failure() && steps.perf_tests.outcome == 'failure'
+        continue-on-error: true
+        run: |
+          echo "Simulator diagnostics:"
+          xcrun simctl list devices
+          echo ""
+          echo "Checking for crash logs:"
+          ls -la ~/Library/Logs/DiagnosticReports/ | tail -20 || true
 
       - name: Fail on regression (opt-in)
         if: steps.compare.outcome == 'failure'

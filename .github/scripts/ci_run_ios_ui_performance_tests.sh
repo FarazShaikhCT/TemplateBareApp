@@ -5,6 +5,16 @@
 # Do not use CODE_SIGNING_ALLOWED=NO — it breaks embedding/running UI test bundles on many Xcode versions.
 set -euo pipefail
 
+# Ensure timeout command is available (macOS uses gtimeout from coreutils)
+if ! command -v timeout &> /dev/null; then
+  if command -v gtimeout &> /dev/null; then
+    timeout() { gtimeout "$@"; }
+  else
+    echo "::warning::timeout command not available, timeouts will not be enforced"
+    timeout() { shift; "$@"; }
+  fi
+fi
+
 ROOT="${GITHUB_WORKSPACE:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 BUILD_DIR="${ROOT}/build"
 mkdir -p "${BUILD_DIR}"
@@ -44,6 +54,8 @@ if [[ -z "${DESTINATION}" || "${DESTINATION}" = "auto" ]]; then
   DESTINATION="$(python3 "${ROOT}/.github/scripts/ios_first_iphone_sim_udid.py")"
 fi
 echo "Destination: ${DESTINATION}"
+echo "Available simulators:"
+xcrun simctl list devices available | grep -E "iPhone|iPad" | head -10
 
 if [[ "${DESTINATION}" == *"id="* ]]; then
   UDID="${DESTINATION#*id=}"
@@ -54,13 +66,37 @@ fi
 if [[ -n "${UDID:-}" ]]; then
   echo "Booting simulator ${UDID}..."
   xcrun simctl boot "${UDID}" 2>/dev/null || true
-  xcrun simctl bootstatus "${UDID}" -b
+  
+  # Wait for simulator boot with timeout (max 120 seconds)
+  echo "Waiting for simulator to boot..."
+  if ! timeout 120 xcrun simctl bootstatus "${UDID}" -b; then
+    echo "::error::Simulator failed to boot within 120 seconds"
+    xcrun simctl list devices
+    exit 1
+  fi
+  
+  # Verify simulator is actually booted
+  SIM_STATE=$(xcrun simctl list devices | grep -A1 "${UDID}" | grep -o "Booted\|Shutdown" || echo "Unknown")
+  echo "Simulator state: ${SIM_STATE}"
+  if [[ "${SIM_STATE}" != "Booted" ]]; then
+    echo "::warning::Simulator not in Booted state, attempting to continue anyway"
+  fi
+  
+  # Give the simulator a moment to stabilize
+  sleep 5
 fi
 
 cd "${ROOT}"
 
 rm -rf "${BUILD_DIR}/TestResults.xcresult"
 echo "Building + running: ${IOS_PERFORMANCE_ONLY_TEST} (PERF_METRICS_MODE=${PERF_METRICS_MODE}, configuration=${IOS_BUILD_CONFIGURATION})"
+
+# Pre-flight check: ensure xcodebuild can see the workspace
+if ! xcodebuild -list -workspace "${IOS_WORKSPACE}" &>/dev/null; then
+  echo "::error::xcodebuild cannot access workspace ${IOS_WORKSPACE}"
+  exit 2
+fi
+echo "Workspace validated: ${IOS_WORKSPACE}"
 
 RETRY_FLAG=()
 if [[ "${PERF_METRICS_MODE}" == "launch" ]]; then
@@ -70,8 +106,9 @@ fi
 # ── Phase 1: build-for-testing ─────────────────────────────────────────────
 # Separating build from test gives a clear build-error signal and lets us
 # verify that main.jsbundle was embedded (FORCE_BUNDLING=1) before tests run.
+echo "Starting build-for-testing phase (timeout: 15 minutes)..."
 set +e
-xcodebuild build-for-testing \
+timeout 900 xcodebuild build-for-testing \
   -workspace "${IOS_WORKSPACE}" \
   -scheme "${IOS_SCHEME}" \
   -configuration "${IOS_BUILD_CONFIGURATION}" \
@@ -86,11 +123,16 @@ xcodebuild build-for-testing \
 BUILD_EXIT="${PIPESTATUS[0]}"
 set -e
 
-if [[ "${BUILD_EXIT}" -ne 0 ]]; then
+if [[ "${BUILD_EXIT}" -eq 124 ]]; then
+  echo "::error::xcodebuild build-for-testing timed out after 15 minutes"
+  tail -n 100 "${BUILD_DIR}/xcodebuild-test.log" || true
+  exit "${BUILD_EXIT}"
+elif [[ "${BUILD_EXIT}" -ne 0 ]]; then
   echo "::error::xcodebuild build-for-testing failed with exit code ${BUILD_EXIT}"
   tail -n 80 "${BUILD_DIR}/xcodebuild-test.log" || true
   exit "${BUILD_EXIT}"
 fi
+echo "Build-for-testing completed successfully"
 
 # ── Verify JS bundle was embedded ──────────────────────────────────────────
 PRODUCTS_DIR="${BUILD_DIR}/DerivedData/Build/Products/${IOS_BUILD_CONFIGURATION}-iphonesimulator"
@@ -102,8 +144,10 @@ else
 fi
 
 # ── Phase 2: test-without-building ─────────────────────────────────────────
+echo "Starting test-without-building phase (timeout: 20 minutes)..."
+echo "Running test: ${IOS_PERFORMANCE_ONLY_TEST}"
 set +e
-xcodebuild test-without-building \
+timeout 1200 xcodebuild test-without-building \
   -workspace "${IOS_WORKSPACE}" \
   -scheme "${IOS_SCHEME}" \
   -configuration "${IOS_BUILD_CONFIGURATION}" \
@@ -120,8 +164,17 @@ xcodebuild test-without-building \
 XCODE_EXIT="${PIPESTATUS[0]}"
 set -e
 
-if [[ "${XCODE_EXIT}" -ne 0 ]]; then
+if [[ "${XCODE_EXIT}" -eq 124 ]]; then
+  echo "::error::xcodebuild test-without-building timed out after 20 minutes"
+  echo "Last 100 lines of xcodebuild log:"
+  tail -n 100 "${BUILD_DIR}/xcodebuild-test.log" || true
+  echo ""
+  echo "Checking simulator state..."
+  xcrun simctl list devices | grep -A1 "${UDID:-}" || true
+  exit "${XCODE_EXIT}"
+elif [[ "${XCODE_EXIT}" -ne 0 ]]; then
   echo "::error::xcodebuild test-without-building failed with exit code ${XCODE_EXIT}"
   tail -n 80 "${BUILD_DIR}/xcodebuild-test.log" || true
   exit "${XCODE_EXIT}"
 fi
+echo "Test execution completed successfully"
