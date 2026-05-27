@@ -23,18 +23,28 @@
       </BuildActionEntries>
    </BuildAction>
    <TestAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Debug-Dev"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
          <TestableReference
-            skipped = "NO">
+            skipped = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
                BuildableName = "TemplateBareAppTests.xctest"
                BlueprintName = "TemplateBareAppTests"
+               ReferencedContainer = "container:TemplateBareApp.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "A1B2C3D81AD99517003FC87E"
+               BuildableName = "TemplateBareAppUITests.xctest"
+               BlueprintName = "TemplateBareAppUITests"
                ReferencedContainer = "container:TemplateBareApp.xcodeproj">
             </BuildableReference>
          </TestableReference>

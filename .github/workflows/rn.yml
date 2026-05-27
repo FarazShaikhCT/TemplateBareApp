@@ -127,3 +127,20 @@ jobs:
       firebase_groups: internal-qa
       release_notes: ""
     secrets: inherit
+
+  ios-performance:
+    if: |
+      (github.event_name != 'workflow_dispatch' || inputs.run_internal_release_only == false) &&
+      (needs.detect.outputs.build_system == 'bare' || needs.detect.outputs.build_system == 'expo') &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/development')) ||
+       (github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'master' || github.base_ref == 'development')))
+    needs: [detect, js-lint, security, js-test, expo-native-dirs, ios-dev]
+    uses: ./.github/workflows/rn-job-ios-performance.yml
+    with:
+      perf_metrics_mode: full
+      pr_number: ${{ github.event_name == 'pull_request' && github.event.pull_request.number || '' }}
+    permissions:
+      contents: read
+      pull-requests: write
+    secrets: inherit

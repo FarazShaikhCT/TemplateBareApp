@@ -42,7 +42,7 @@ export function HomeScreen({ navigation }: Props) {
   );
 
   return (
-    <View style={styles.root}>
+    <View style={styles.root} accessibilityLabel="app-root">
       <TopBar
         topBarTitle={APP_DISPLAY_NAME}
         onMenuPress={() => navigation.dispatch(DrawerActions.openDrawer())}

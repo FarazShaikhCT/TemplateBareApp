@@ -73,6 +73,10 @@ on:
         required: false
       SLACK_TRIGGER_WEBHOOK_URL:
         required: false
+    outputs:
+      ios_dev_simulator_artifact_name:
+        description: Debug simulator .app artifact (dev Firebase builds only; used by ios-performance)
+        value: ${{ jobs.release.outputs.ios_dev_simulator_artifact_name }}
 
 env:
   # Expo SDK 55 requires Xcode 26+; EAS defaults to 26.2. Same pin for bare + Expo iOS jobs.
@@ -81,6 +85,8 @@ env:
 jobs:
   release:
     runs-on: macos-15
+    outputs:
+      ios_dev_simulator_artifact_name: ${{ steps.set_sim_artifact.outputs.name }}
     env:
       APP_IDENTIFIER: ${{ inputs.app_identifier }}
     steps:
@@ -202,6 +208,44 @@ jobs:
           name: ios-firebase-${{ inputs.firebase_ios_app }}-${{ github.run_number }}
           path: build/TemplateBareApp.ipa
           if-no-files-found: warn
+      - name: Build Debug simulator .app (for UI performance tests)
+        if: ${{ inputs.firebase_ios_app == 'dev' }}
+        id: sim_app_build
+        env:
+          WS: ios/TemplateBareApp.xcworkspace
+          SC: ${{ inputs.ios_scheme }}
+          BC: ${{ inputs.ios_build_configuration_dev }}
+          DD: ${{ github.workspace }}/DerivedDataCI
+          PRODUCT_BUNDLE_IDENTIFIER: ${{ inputs.app_identifier }}
+        run: |
+          set -euo pipefail
+          DEST=$(python3 .github/scripts/ios_first_iphone_sim_udid.py)
+          xcodebuild build -workspace "$WS" -scheme "$SC" -configuration "$BC" \
+            -destination "$DEST" -derivedDataPath "$DD" \
+            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO \
+            "PRODUCT_BUNDLE_IDENTIFIER=${PRODUCT_BUNDLE_IDENTIFIER}"
+          chmod +x .github/scripts/ios_find_simulator_app.sh
+          APP_PATH="$(.github/scripts/ios_find_simulator_app.sh "$DD" "$BC")"
+          echo "app_path=$APP_PATH" >> "$GITHUB_OUTPUT"
+          echo "Resolved simulator app: $APP_PATH"
+          STAGING="build/ios-dev-simulator-artifact"
+          rm -rf "${STAGING}"
+          mkdir -p "${STAGING}"
+          cp -R "${APP_PATH}" "${STAGING}/"
+          ditto -c -k --keepParent "${APP_PATH}" build/ios-dev-simulator-app.zip
+      - name: Upload simulator .app artifact
+        if: ${{ inputs.firebase_ios_app == 'dev' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-dev-simulator-${{ github.run_id }}
+          path: |
+            build/ios-dev-simulator-artifact
+            build/ios-dev-simulator-app.zip
+          if-no-files-found: error
+      - name: Set simulator artifact output
+        if: ${{ inputs.firebase_ios_app == 'dev' }}
+        id: set_sim_artifact
+        run: echo "name=ios-dev-simulator-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
       - name: Notify Slack (workflow webhook)
         if: ${{ inputs.dry_run == false && inputs.upload_to_firebase && steps.upload_firebase.outcome == 'success' }}
         env:
