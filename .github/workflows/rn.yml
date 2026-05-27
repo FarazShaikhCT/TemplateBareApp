@@ -135,7 +135,7 @@ jobs:
       pull-requests: write
     with:
       # ── App identity ────────────────────────────────────────────────────────
-      package:  "com.codeandtheory.templatepipelinetest.dev"
+      package: "com.codeandtheory.templatepipelinetest.dev"
       # applicationId/fully-qualified activity (dev flavor uses .dev suffix on package)
       activity: "com.codeandtheory.templatepipelinetest.dev/com.codeandtheory.templatepipelinetest.MainActivity"
 
@@ -146,39 +146,39 @@ jobs:
 
       # ── FPS target: PostsScreen FlatList (needs API_BASE_URL in dev APK) ─────
       # android-dev copies .github/env.dev.ci → .env.dev when missing (JSONPlaceholder).
-      deep_link:            "templatebareapp://posts"
-      perf_settle_seconds:  12
+      deep_link: "templatebareapp://posts"
+      perf_settle_seconds: 12
 
       # ── Runner — self-hosted Mac (no cloud minutes, hardware GPU) ────────────
-      runner:              "self-hosted"
-      emulator_arch:       "arm64-v8a"
-      emulator_gpu:        "auto"
-      setup_java:          false
-      setup_python:        false
-      setup_node:          false
-      setup_android_sdk:   false
-      job_timeout_minutes: 30
+      # runner:              "self-hosted"
+      # emulator_arch:       "arm64-v8a"
+      # emulator_gpu:        "auto"
+      # setup_java:          false
+      # setup_python:        false
+      # setup_node:          false
+      # setup_android_sdk:   false
+      # job_timeout_minutes: 30
 
       # ── Cloud fallback (Intel CI without a Mac runner) ──────────────────────
-      # runner:              "ubuntu-latest"
-      # emulator_arch:       "x86_64"
-      # emulator_gpu:        "swiftshader_indirect"
-      # setup_java:          true
-      # setup_python:        true
-      # setup_node:          true
-      # setup_android_sdk:   true
-      # job_timeout_minutes: 25
+      runner: "ubuntu-latest"
+      emulator_arch: "x86_64"
+      emulator_gpu: "swiftshader_indirect"
+      setup_java: true
+      setup_python: true
+      setup_node: true
+      setup_android_sdk: true
+      job_timeout_minutes: 25
 
       # ── Gates ────────────────────────────────────────────────────────────────
       # After the first successful run on main the CI auto-switches to
       # baseline-comparison mode (25% tolerance) stored on the perf-data branch.
-      baselines_path:           "scripts/perf/perf_baselines.json"
-      baseline_tolerance_pct:   25
-      soft:                     false
-      fail_on_regression:       false
+      baselines_path: "scripts/perf/perf_baselines.json"
+      baseline_tolerance_pct: 25
+      soft: false
+      fail_on_regression: false
 
       # ── Report ───────────────────────────────────────────────────────────────
-      out_dir:                 "build/reports/perf"
+      out_dir: "build/reports/perf"
       artifact_retention_days: 14
     secrets: inherit
 
