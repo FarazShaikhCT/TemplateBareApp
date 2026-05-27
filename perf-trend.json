@@ -26,5 +26,19 @@
     "memory_leak_mb_per_cycle": -3.086,
     "api_latency_p95_ms": null,
     "passed": true
+  },
+  {
+    "timestamp": "2026-05-27T09:17:13Z",
+    "git_sha": "ffa5dcbd113a641ace76fb0c567c14d67db2ab05",
+    "branch": "2/merge",
+    "run_id": "26500830251",
+    "launch_time_ms": 2177.0,
+    "fps": 19.83,
+    "memory_mb": 228.76,
+    "cpu_spike_pct": 22.86,
+    "apk_size_mb": 78.93,
+    "memory_leak_mb_per_cycle": -7.454,
+    "api_latency_p95_ms": null,
+    "passed": false
   }
 ]
