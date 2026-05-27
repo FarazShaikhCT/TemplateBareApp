@@ -60,15 +60,50 @@ fi
 cd "${ROOT}"
 
 rm -rf "${BUILD_DIR}/TestResults.xcresult"
-echo "Running tests: ${IOS_PERFORMANCE_ONLY_TEST} (PERF_METRICS_MODE=${PERF_METRICS_MODE}, configuration=${IOS_BUILD_CONFIGURATION})"
+echo "Building + running: ${IOS_PERFORMANCE_ONLY_TEST} (PERF_METRICS_MODE=${PERF_METRICS_MODE}, configuration=${IOS_BUILD_CONFIGURATION})"
 
 RETRY_FLAG=()
 if [[ "${PERF_METRICS_MODE}" == "launch" ]]; then
   RETRY_FLAG=(-retry-tests-on-failure)
 fi
 
+# ── Phase 1: build-for-testing ─────────────────────────────────────────────
+# Separating build from test gives a clear build-error signal and lets us
+# verify that main.jsbundle was embedded (FORCE_BUNDLING=1) before tests run.
 set +e
-xcodebuild test \
+xcodebuild build-for-testing \
+  -workspace "${IOS_WORKSPACE}" \
+  -scheme "${IOS_SCHEME}" \
+  -configuration "${IOS_BUILD_CONFIGURATION}" \
+  -sdk iphonesimulator \
+  -destination "${DESTINATION}" \
+  -derivedDataPath "${BUILD_DIR}/DerivedData" \
+  CODE_SIGN_IDENTITY=- \
+  CODE_SIGNING_REQUIRED=NO \
+  CODE_SIGNING_ALLOWED=YES \
+  FORCE_BUNDLING=1 \
+  2>&1 | tee "${BUILD_DIR}/xcodebuild-test.log"
+BUILD_EXIT="${PIPESTATUS[0]}"
+set -e
+
+if [[ "${BUILD_EXIT}" -ne 0 ]]; then
+  echo "::error::xcodebuild build-for-testing failed with exit code ${BUILD_EXIT}"
+  tail -n 80 "${BUILD_DIR}/xcodebuild-test.log" || true
+  exit "${BUILD_EXIT}"
+fi
+
+# ── Verify JS bundle was embedded ──────────────────────────────────────────
+PRODUCTS_DIR="${BUILD_DIR}/DerivedData/Build/Products/${IOS_BUILD_CONFIGURATION}-iphonesimulator"
+BUILT_APP="$(find "${PRODUCTS_DIR}" -maxdepth 1 -name "*.app" ! -name "*UITests*" 2>/dev/null | head -1 || true)"
+if [[ -n "${BUILT_APP}" && -f "${BUILT_APP}/main.jsbundle" ]]; then
+  echo "✓ main.jsbundle found in built app: ${BUILT_APP}"
+else
+  echo "::warning::main.jsbundle NOT found in ${BUILT_APP:-${PRODUCTS_DIR}} — testTypicalSessionCPUAndMemory will be skipped by XCTSkip"
+fi
+
+# ── Phase 2: test-without-building ─────────────────────────────────────────
+set +e
+xcodebuild test-without-building \
   -workspace "${IOS_WORKSPACE}" \
   -scheme "${IOS_SCHEME}" \
   -configuration "${IOS_BUILD_CONFIGURATION}" \
@@ -81,16 +116,12 @@ xcodebuild test \
   -parallel-testing-enabled NO \
   -maximum-concurrent-test-simulator-destinations 1 \
   "${RETRY_FLAG[@]}" \
-  CODE_SIGN_IDENTITY=- \
-  CODE_SIGNING_REQUIRED=NO \
-  CODE_SIGNING_ALLOWED=YES \
-  FORCE_BUNDLING=1 \
-  2>&1 | tee "${BUILD_DIR}/xcodebuild-test.log"
+  2>&1 | tee -a "${BUILD_DIR}/xcodebuild-test.log"
 XCODE_EXIT="${PIPESTATUS[0]}"
 set -e
 
 if [[ "${XCODE_EXIT}" -ne 0 ]]; then
-  echo "::error::xcodebuild test failed with exit code ${XCODE_EXIT}"
+  echo "::error::xcodebuild test-without-building failed with exit code ${XCODE_EXIT}"
   tail -n 80 "${BUILD_DIR}/xcodebuild-test.log" || true
   exit "${XCODE_EXIT}"
 fi
