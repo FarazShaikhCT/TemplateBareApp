@@ -43,7 +43,7 @@
 
   <div class="stats">
     <div class="stat">
-      <div class="value">2</div>
+      <div class="value">3</div>
       <div class="label">Total Runs</div>
     </div>
     <div class="stat">
@@ -51,7 +51,7 @@
       <div class="label">Passed</div>
     </div>
     <div class="stat">
-      <div class="value" style="color:#991b1b">1</div>
+      <div class="value" style="color:#991b1b">2</div>
       <div class="label">Failed</div>
     </div>
   </div>
@@ -68,10 +68,10 @@
       new Chart(ctx, {
         type: 'line',
         data: {
-          labels: ["2026-05-25 5fc932f (2/merge)", "2026-05-26 e63ce1c (2/merge)"],
+          labels: ["2026-05-25 5fc932f (2/merge)", "2026-05-26 e63ce1c (2/merge)", "2026-05-27 ffa5dcb (2/merge)"],
           datasets: [{
             label: 'launch_time_ms',
-            data: [2783.0, 1597.0],
+            data: [2783.0, 1597.0, 2177.0],
             borderWidth: 2,
             pointRadius: 4,
             tension: 0.3,
@@ -79,7 +79,7 @@
         },
 {
             label: 'Gate (8000)',
-            data: Array(2).fill(8000),
+            data: Array(3).fill(8000),
             borderDash: [6, 3],
             borderWidth: 1.5,
             pointRadius: 0,
@@ -111,10 +111,10 @@
       new Chart(ctx, {
         type: 'line',
         data: {
-          labels: ["2026-05-25 5fc932f (2/merge)", "2026-05-26 e63ce1c (2/merge)"],
+          labels: ["2026-05-25 5fc932f (2/merge)", "2026-05-26 e63ce1c (2/merge)", "2026-05-27 ffa5dcb (2/merge)"],
           datasets: [{
             label: 'fps',
-            data: [1.95, 29.45],
+            data: [1.95, 29.45, 19.83],
             borderWidth: 2,
             pointRadius: 4,
             tension: 0.3,
@@ -122,7 +122,7 @@
         },
 {
             label: 'Gate (30)',
-            data: Array(2).fill(30),
+            data: Array(3).fill(30),
             borderDash: [6, 3],
             borderWidth: 1.5,
             pointRadius: 0,
@@ -154,10 +154,10 @@
       new Chart(ctx, {
         type: 'line',
         data: {
-          labels: ["2026-05-25 5fc932f (2/merge)", "2026-05-26 e63ce1c (2/merge)"],
+          labels: ["2026-05-25 5fc932f (2/merge)", "2026-05-26 e63ce1c (2/merge)", "2026-05-27 ffa5dcb (2/merge)"],
           datasets: [{
             label: 'memory_mb',
-            data: [216.61, 226.24],
+            data: [216.61, 226.24, 228.76],
             borderWidth: 2,
             pointRadius: 4,
             tension: 0.3,
@@ -165,7 +165,7 @@
         },
 {
             label: 'Gate (400)',
-            data: Array(2).fill(400),
+            data: Array(3).fill(400),
             borderDash: [6, 3],
             borderWidth: 1.5,
             pointRadius: 0,
@@ -197,10 +197,10 @@
       new Chart(ctx, {
         type: 'line',
         data: {
-          labels: ["2026-05-25 5fc932f (2/merge)", "2026-05-26 e63ce1c (2/merge)"],
+          labels: ["2026-05-25 5fc932f (2/merge)", "2026-05-26 e63ce1c (2/merge)", "2026-05-27 ffa5dcb (2/merge)"],
           datasets: [{
             label: 'cpu_spike_pct',
-            data: [5.05, 22.73],
+            data: [5.05, 22.73, 22.86],
             borderWidth: 2,
             pointRadius: 4,
             tension: 0.3,
@@ -208,7 +208,7 @@
         },
 {
             label: 'Gate (80)',
-            data: Array(2).fill(80),
+            data: Array(3).fill(80),
             borderDash: [6, 3],
             borderWidth: 1.5,
             pointRadius: 0,
@@ -240,10 +240,10 @@
       new Chart(ctx, {
         type: 'line',
         data: {
-          labels: ["2026-05-25 5fc932f (2/merge)", "2026-05-26 e63ce1c (2/merge)"],
+          labels: ["2026-05-25 5fc932f (2/merge)", "2026-05-26 e63ce1c (2/merge)", "2026-05-27 ffa5dcb (2/merge)"],
           datasets: [{
             label: 'apk_size_mb',
-            data: [78.93, 78.93],
+            data: [78.93, 78.93, 78.93],
             borderWidth: 2,
             pointRadius: 4,
             tension: 0.3,
@@ -251,7 +251,7 @@
         },
 {
             label: 'Gate (80)',
-            data: Array(2).fill(80),
+            data: Array(3).fill(80),
             borderDash: [6, 3],
             borderWidth: 1.5,
             pointRadius: 0,
@@ -283,10 +283,10 @@
       new Chart(ctx, {
         type: 'line',
         data: {
-          labels: ["2026-05-25 5fc932f (2/merge)", "2026-05-26 e63ce1c (2/merge)"],
+          labels: ["2026-05-25 5fc932f (2/merge)", "2026-05-26 e63ce1c (2/merge)", "2026-05-27 ffa5dcb (2/merge)"],
           datasets: [{
             label: 'memory_leak_mb_per_cycle',
-            data: [0.007, -3.086],
+            data: [0.007, -3.086, -7.454],
             borderWidth: 2,
             pointRadius: 4,
             tension: 0.3,
@@ -294,7 +294,7 @@
         },
 {
             label: 'Gate (3.0)',
-            data: Array(2).fill(3.0),
+            data: Array(3).fill(3.0),
             borderDash: [6, 3],
             borderWidth: 1.5,
             pointRadius: 0,
@@ -326,10 +326,10 @@
       new Chart(ctx, {
         type: 'line',
         data: {
-          labels: ["2026-05-25 5fc932f (2/merge)", "2026-05-26 e63ce1c (2/merge)"],
+          labels: ["2026-05-25 5fc932f (2/merge)", "2026-05-26 e63ce1c (2/merge)", "2026-05-27 ffa5dcb (2/merge)"],
           datasets: [{
             label: 'api_latency_p95_ms',
-            data: [null, null],
+            data: [null, null, null],
             borderWidth: 2,
             pointRadius: 4,
             tension: 0.3,
@@ -364,7 +364,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr><td>2026-05-26T07:32</td><td><code>e63ce1c</code></td><td>2/merge</td><td>26437516907</td><td>1597.0</td><td>29.45</td><td>226.24</td><td>22.73</td><td>78.93</td><td><span class="pass">PASS</span></td></tr>
+        <tr><td>2026-05-27T09:17</td><td><code>ffa5dcb</code></td><td>2/merge</td><td>26500830251</td><td>2177.0</td><td>19.83</td><td>228.76</td><td>22.86</td><td>78.93</td><td><span class="fail">FAIL</span></td></tr>
+<tr><td>2026-05-26T07:32</td><td><code>e63ce1c</code></td><td>2/merge</td><td>26437516907</td><td>1597.0</td><td>29.45</td><td>226.24</td><td>22.73</td><td>78.93</td><td><span class="pass">PASS</span></td></tr>
 <tr><td>2026-05-25T13:55</td><td><code>5fc932f</code></td><td>2/merge</td><td>26401769489</td><td>2783.0</td><td>1.95</td><td>216.61</td><td>5.05</td><td>78.93</td><td><span class="fail">FAIL</span></td></tr>
       </tbody>
     </table>
