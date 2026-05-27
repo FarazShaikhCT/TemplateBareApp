@@ -98,9 +98,11 @@ if ! xcodebuild -list -workspace "${IOS_WORKSPACE}" &>/dev/null; then
 fi
 echo "Workspace validated: ${IOS_WORKSPACE}"
 
-RETRY_FLAG=()
+# Use a plain string, not an array: bash 3.2 (macOS default) treats
+# "${empty_array[@]}" as an unbound variable when set -u is active.
+RETRY_FLAG=""
 if [[ "${PERF_METRICS_MODE}" == "launch" ]]; then
-  RETRY_FLAG=(-retry-tests-on-failure)
+  RETRY_FLAG="-retry-tests-on-failure"
 fi
 
 # ── Phase 1: build-for-testing ─────────────────────────────────────────────
@@ -159,7 +161,7 @@ timeout 1200 xcodebuild test-without-building \
   -resultBundlePath "${BUILD_DIR}/TestResults.xcresult" \
   -parallel-testing-enabled NO \
   -maximum-concurrent-test-simulator-destinations 1 \
-  "${RETRY_FLAG[@]}" \
+  ${RETRY_FLAG:+"${RETRY_FLAG}"} \
   2>&1 | tee -a "${BUILD_DIR}/xcodebuild-test.log"
 XCODE_EXIT="${PIPESTATUS[0]}"
 set -e
