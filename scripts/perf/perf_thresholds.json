@@ -1,0 +1,10 @@
+{
+  "_comment": "Hard thresholds used when no baseline exists yet (first run). These are intentionally loose for a React Native app on an emulator. After the first successful run on main, CI switches to baseline-comparison mode automatically.",
+  "launch_time_ms": 8000,
+  "fps_min": 30,
+  "memory_mb_max": 400,
+  "cpu_peak_pct_max": 80,
+  "cpu_time_s_max": 10.0,
+  "apk_size_mb_max": 80,
+  "memory_leak_mb_per_cycle_max": 3.0
+}

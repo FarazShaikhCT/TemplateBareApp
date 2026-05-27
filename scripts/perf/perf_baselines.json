@@ -1,0 +1,13 @@
+{
+  "_comment": "Seed baselines for CI gate before the first real run on main establishes main-perf-baseline.json on the perf-data branch. Re-record after first run with: python3 scripts/perf/record_baselines.py --report build/reports/perf/perf-report.json --out scripts/perf/perf_baselines.json",
+  "relative_tolerance_pct": 25,
+  "metrics": {
+    "launch_time": 8000,
+    "fps": 30,
+    "memory": 400,
+    "cpu_spike": 80,
+    "cpu_time": 10,
+    "apk_size": 80,
+    "memory_leak": 3.0
+  }
+}

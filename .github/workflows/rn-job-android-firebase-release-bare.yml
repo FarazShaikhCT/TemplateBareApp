@@ -74,6 +74,11 @@ jobs:
           ref: ${{ inputs.branch }}
           fetch-depth: 0
 
+      - name: Ensure react-native-config env file
+        run: |
+          FLAVOR=$(echo "${{ inputs.gradle_task }}" | sed 's/^assemble//;s/Release$//;s/Debug$//' | tr '[:upper:]' '[:lower:]')
+          bash .github/scripts/ensure_react_native_config_env.sh "${FLAVOR:-dev}"
+
       - name: Restore Firebase client config
         uses: ./.github/actions/restore-firebase-client-config
         with:

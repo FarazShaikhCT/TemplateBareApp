@@ -9,7 +9,7 @@ alwaysApply: false
 
 | Workflow | Role |
 |----------|------|
-| `rn.yml` | Main CI: `detect` → JS lint/security/test → **`expo-native-dirs`** gate (no-op for bare; for Expo asserts committed `android/` + `ios/`) → **`android-dev` / `ios-dev`** when `build_system` is **`bare`** or **`expo`** (PR: artifacts; push: Firebase). **`detect`:** `expo` if `package.json` lists the **`expo`** package, else **`bare`**. No EAS jobs in this orchestrator. `pull_request` types still include `labeled` / `unlabeled` for other hooks. Other: `rn-internal-release.yml`, `rn-firebase-release.yml` |
+| `rn.yml` | Main CI: `detect` → JS lint/security/test → **`expo-native-dirs`** gate (no-op for bare; for Expo asserts committed `android/` + `ios/`) → **`android-dev` / `ios-dev`** when `build_system` is **`bare`** or **`expo`** (PR: artifacts; push: Firebase). **`android-perf`:** after **`android-dev`** succeeds, downloads its APK artifact (no second Gradle build) and runs emulator perf gate (self-hosted Mac by default; see `rn-job-android-perf.yml`). **`detect`:** `expo` if `package.json` lists the **`expo`** package, else **`bare`**. No EAS jobs in this orchestrator. `pull_request` types still include `labeled` / `unlabeled` for other hooks. Other: `rn-internal-release.yml`, `rn-firebase-release.yml` |
 | `rn-internal-release.yml` | Manual: **`auto` \| `bare` \| `expo`** (same `package.json` detection as `rn.yml`) → **`expo-native-dirs`** → Gradle + Fastlane for bare and Expo (committed native) |
 | `rn-firebase-release.yml` | Manual Firebase: same **`build_system`** as `rn.yml`; **`expo-native-dirs`** then bare-style Firebase jobs; `platform` = `android-dist`, `android-dev`, etc. |
 | `rn-code-health.yml` | Tech-debt / health scripts |
@@ -18,7 +18,7 @@ alwaysApply: false
 ## Reusable jobs (prefix `rn-job-`)
 
 - **JS:** `rn-job-js-lint.yml`, `rn-job-js-test.yml`, `rn-job-security.yml`
-- **Android:** `rn-job-android-build-bare.yml`, `rn-job-android-build-expo.yml`, `rn-job-android-internal-release-bare.yml`, `rn-job-android-internal-release-expo.yml`, `rn-job-android-debug-apk.yml`, `rn-job-android-firebase-release-bare.yml` (inputs `firebase_android_app` `dev`|`dist`, Gradle task + APK glob for flavor)
+- **Android:** `rn-job-android-build-bare.yml`, `rn-job-android-build-expo.yml`, `rn-job-android-internal-release-bare.yml`, `rn-job-android-internal-release-expo.yml`, `rn-job-android-debug-apk.yml`, `rn-job-android-firebase-release-bare.yml` (inputs `firebase_android_app` `dev`|`dist`, Gradle task + APK glob for flavor), `rn-job-android-perf.yml` (emulator perf gate; scripts in `scripts/perf/`, trend/baseline on `perf-data` branch)
 - **iOS:** `rn-job-ios-build-bare.yml`, `rn-job-ios-build-expo-local.yml`, `rn-job-ios-build-expo-cloud.yml`, `rn-job-ios-internal-release-bare.yml`, `rn-job-ios-internal-release-expo.yml`, `rn-job-ios-firebase-release-bare.yml` — plus **optional** (not called from default `rn.yml`): `rn-job-ios-simulator-artifact.yml`, `rn-job-ios-test.yml`
 - **EAS (not used by default `rn.yml`):** `rn-job-expo-eas-build-and-distribute.yml` — kept for manual or custom wiring
 
