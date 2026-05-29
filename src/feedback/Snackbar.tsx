@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Text, StyleSheet, Animated, Pressable, Platform } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import type { SnackbarConfig } from './types';
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Text, StyleSheet, Animated, Pressable, Platform } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import type { SnackbarConfig } from "./types";
 
 interface SnackbarProps {
   config: SnackbarConfig | null;
@@ -52,16 +52,16 @@ export function Snackbar({ config, onDismiss }: SnackbarProps) {
 
   if (!config) return null;
 
-  const position = config.position || 'bottom';
-  const backgroundColor = getBackgroundColor(config.type || 'info');
+  const position = config.position || "bottom";
+  const backgroundColor = getBackgroundColor(config.type || "info");
 
   const translateY = animation.interpolate({
     inputRange: [0, 1],
-    outputRange: position === 'bottom' ? [100, 0] : [-100, 0],
+    outputRange: position === "bottom" ? [100, 0] : [-100, 0],
   });
 
   const positionStyle =
-    position === 'bottom'
+    position === "bottom"
       ? { bottom: insets.bottom + 16 }
       : { top: insets.top + 16 };
 
@@ -93,27 +93,27 @@ export function Snackbar({ config, onDismiss }: SnackbarProps) {
 
 function getBackgroundColor(type: string): string {
   switch (type) {
-    case 'success':
-      return '#4CAF50';
-    case 'error':
-      return '#F44336';
-    case 'warning':
-      return '#FF9800';
-    case 'info':
+    case "success":
+      return "#4CAF50";
+    case "error":
+      return "#F44336";
+    case "warning":
+      return "#FF9800";
+    case "info":
     default:
-      return '#2196F3';
+      return "#2196F3";
   }
 }
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
+    position: "absolute",
     left: 16,
     right: 16,
     borderRadius: 8,
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
+        shadowColor: "#000",
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 6,
@@ -124,16 +124,16 @@ const styles = StyleSheet.create({
     }),
   },
   content: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 14,
   },
   message: {
     flex: 1,
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
     lineHeight: 20,
   },
   actionButton: {
@@ -142,9 +142,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   actionText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 14,
-    fontWeight: '700',
-    textTransform: 'uppercase',
+    fontWeight: "700",
+    textTransform: "uppercase",
   },
 });

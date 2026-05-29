@@ -1,5 +1,5 @@
 import "react-native-gesture-handler";
-import './src/notifications/notificationSetup';
+import "./src/notifications/notificationSetup";
 
 import { registerRootComponent } from "expo";
 

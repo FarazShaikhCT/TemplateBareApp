@@ -13,7 +13,7 @@ export function AppRootErrorBoundary({ children }: AppRootErrorBoundaryProps) {
 
   const handleRecover = useCallback(() => {
     void queryClient.invalidateQueries();
-    setResetKey((k) => k + 1);
+    setResetKey(k => k + 1);
   }, [queryClient]);
 
   return (

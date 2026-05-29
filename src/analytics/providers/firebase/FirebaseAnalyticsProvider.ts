@@ -1,6 +1,6 @@
-import analytics from '@react-native-firebase/analytics';
+import analytics from "@react-native-firebase/analytics";
 
-import type { IAnalyticsProvider } from '../IAnalyticsProvider';
+import type { IAnalyticsProvider } from "../IAnalyticsProvider";
 
 export class FirebaseAnalyticsProvider implements IAnalyticsProvider {
   async logEvent(

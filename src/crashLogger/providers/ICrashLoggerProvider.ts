@@ -19,10 +19,7 @@ export interface ICrashLoggerProvider {
    * Attaches a custom key/value pair to all subsequent crash reports.
    * Useful for build variant, feature flags, or session context.
    */
-  setCustomKey(
-    key: string,
-    value: string | number | boolean,
-  ): Promise<void>;
+  setCustomKey(key: string, value: string | number | boolean): Promise<void>;
 
   /**
    * Forces a native crash — for testing crash reporting end-to-end.

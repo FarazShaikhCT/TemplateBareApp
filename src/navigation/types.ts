@@ -30,14 +30,14 @@ export type DrawerParamList = {
   TabRoot: NavigatorScreenParams<MainTabParamList>;
   Settings: ProfileStackParamList["Settings"];
   About: undefined;
-  MediaPlayer: undefined,
-  AnalyticsDemo: undefined,
+  MediaPlayer: undefined;
+  AnalyticsDemo: undefined;
   FeedbackCatalog: undefined;
-  RemoteConfig: undefined,
+  RemoteConfig: undefined;
   NotificationsCatalog: undefined;
   CarouselCatalog: undefined;
   PermissionsDemo: undefined;
-  CrashLoggerDemo: undefined,
+  CrashLoggerDemo: undefined;
 };
 
 export type RootStackParamList = {

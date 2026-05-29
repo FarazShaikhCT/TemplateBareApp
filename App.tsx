@@ -11,33 +11,33 @@ import { AppThemeProvider } from "./src/theme/ThemeContext";
 import { ConnectivityProvider } from "./src/connectivity/ConnectivityHelper";
 import { AppRootErrorBoundary } from "./src/utils/errorBoundary";
 import { LoadingProvider } from "./src/utils/loading";
-import { logEvent } from './src/analytics/analytics';
-import { RemoteConfigProvider } from './src/remoteConfig/RemoteConfigContext';
-import { FeedbackProvider } from './src/feedback';
-import { NotificationsProvider } from './src/notifications';
+import { logEvent } from "./src/analytics/analytics";
+import { RemoteConfigProvider } from "./src/remoteConfig/RemoteConfigContext";
+import { FeedbackProvider } from "./src/feedback";
+import { NotificationsProvider } from "./src/notifications";
 
 export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <BottomSheetModalProvider>
         <SafeAreaProvider>
-                <NotificationsProvider>
-                <FeedbackProvider>
-          <QueryProvider>
-            <AppThemeProvider>
-              <ConnectivityProvider>
-                <LoadingProvider>
-                  <AppRootErrorBoundary>
-                    <RemoteConfigProvider>
-                    <ThemedNavigationContainer />
-                    </RemoteConfigProvider>
-                  </AppRootErrorBoundary>
-                </LoadingProvider>
-              </ConnectivityProvider>
-            </AppThemeProvider>
-          </QueryProvider>
-          </FeedbackProvider>
-                </NotificationsProvider>
+          <NotificationsProvider>
+            <FeedbackProvider>
+              <QueryProvider>
+                <AppThemeProvider>
+                  <ConnectivityProvider>
+                    <LoadingProvider>
+                      <AppRootErrorBoundary>
+                        <RemoteConfigProvider>
+                          <ThemedNavigationContainer />
+                        </RemoteConfigProvider>
+                      </AppRootErrorBoundary>
+                    </LoadingProvider>
+                  </ConnectivityProvider>
+                </AppThemeProvider>
+              </QueryProvider>
+            </FeedbackProvider>
+          </NotificationsProvider>
         </SafeAreaProvider>
       </BottomSheetModalProvider>
     </GestureHandlerRootView>

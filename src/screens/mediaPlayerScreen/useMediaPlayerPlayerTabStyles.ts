@@ -1,6 +1,6 @@
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from "react-native";
 
-import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useThemedStyles } from "../../theme/useThemedStyles";
 
 export function useMediaPlayerPlayerTabStyles() {
   return useThemedStyles(
@@ -16,7 +16,7 @@ export function useMediaPlayerPlayerTabStyles() {
       },
       title: {
         fontSize: 20,
-        fontWeight: '600',
+        fontWeight: "600",
         marginBottom: 8,
         color: colors.text1,
       },
@@ -26,59 +26,59 @@ export function useMediaPlayerPlayerTabStyles() {
         marginBottom: 12,
       },
       modeRow: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
+        flexDirection: "row",
+        flexWrap: "wrap",
         gap: 8,
         marginBottom: 8,
       },
       modeBtn: {
         flexGrow: 1,
-        flexBasis: '30%',
+        flexBasis: "30%",
         minWidth: 96,
         paddingVertical: 10,
         paddingHorizontal: 8,
         borderRadius: 8,
         backgroundColor: colors.grayBackground,
-        alignItems: 'center',
+        alignItems: "center",
       },
       modeBtnActive: {
         backgroundColor: colors.primary,
       },
       modeBtnText: {
         fontSize: 13,
-        fontWeight: '600',
+        fontWeight: "600",
         color: colors.text2,
-        textAlign: 'center',
+        textAlign: "center",
       },
       modeBtnTextActive: {
         color: colors.textOnPrimary,
       },
       playerWrap: {
-        backgroundColor: '#000',
+        backgroundColor: "#000",
         borderRadius: 8,
-        overflow: 'hidden',
+        overflow: "hidden",
         aspectRatio: 16 / 9,
-        width: '100%',
+        width: "100%",
       },
       offlinePlaceholder: {
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
         paddingHorizontal: 16,
         backgroundColor: colors.grayBackground,
       },
       offlinePlaceholderText: {
         fontSize: 14,
         color: colors.text2,
-        textAlign: 'center',
+        textAlign: "center",
       },
       video: {
         ...StyleSheet.absoluteFillObject,
       },
       spinnerWrap: {
         ...StyleSheet.absoluteFillObject,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.2)',
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "rgba(0,0,0,0.2)",
       },
       error: {
         color: colors.error,
@@ -91,20 +91,20 @@ export function useMediaPlayerPlayerTabStyles() {
       },
       mono: {
         fontFamily: Platform.select({
-          ios: 'Menlo',
-          android: 'monospace',
-          default: 'monospace',
+          ios: "Menlo",
+          android: "monospace",
+          default: "monospace",
         }),
         fontSize: 12,
         color: colors.text1,
       },
       pipRow: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
+        flexDirection: "row",
+        flexWrap: "wrap",
         gap: 8,
         marginTop: 10,
         marginBottom: 4,
-        alignItems: 'center',
+        alignItems: "center",
       },
       pipBtn: {
         paddingVertical: 8,
@@ -116,7 +116,7 @@ export function useMediaPlayerPlayerTabStyles() {
       },
       pipBtnText: {
         fontSize: 13,
-        fontWeight: '600',
+        fontWeight: "600",
         color: colors.text1,
       },
       pipHint: {

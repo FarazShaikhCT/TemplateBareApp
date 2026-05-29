@@ -1,6 +1,6 @@
-import crashlytics from '@react-native-firebase/crashlytics';
+import crashlytics from "@react-native-firebase/crashlytics";
 
-import type { ICrashLoggerProvider } from '../ICrashLoggerProvider';
+import type { ICrashLoggerProvider } from "../ICrashLoggerProvider";
 
 /**
  * Firebase Crashlytics implementation of ICrashLoggerProvider.
@@ -29,7 +29,7 @@ export class FirebaseCrashlyticsProvider implements ICrashLoggerProvider {
   }
 
   async setUserId(userId: string | null): Promise<void> {
-    await crashlytics().setUserId(userId ?? '');
+    await crashlytics().setUserId(userId ?? "");
   }
 
   async setCustomKey(

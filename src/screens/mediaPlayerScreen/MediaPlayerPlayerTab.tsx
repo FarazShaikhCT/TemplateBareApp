@@ -4,7 +4,7 @@ import React, {
   useMemo,
   useRef,
   useState,
-} from 'react';
+} from "react";
 import {
   View,
   Text,
@@ -12,23 +12,23 @@ import {
   Pressable,
   ActivityIndicator,
   Platform,
-} from 'react-native';
+} from "react-native";
 import type {
   OnBufferData,
   OnPictureInPictureStatusChangedData,
   OnVideoErrorData,
-} from 'react-native-video';
-import type { VideoRef } from 'react-native-video';
+} from "react-native-video";
+import type { VideoRef } from "react-native-video";
 
 import {
   MediaPlayer,
   buildDemoClearHlsSource,
   buildDemoDrmSource,
   buildLocalVideoSource,
-} from '../../mediaPlayer';
+} from "../../mediaPlayer";
 
-import type { PlaybackMode } from './mediaPlayerScreen.types';
-import { useMediaPlayerPlayerTabStyles } from './useMediaPlayerPlayerTabStyles';
+import type { PlaybackMode } from "./mediaPlayerScreen.types";
+import { useMediaPlayerPlayerTabStyles } from "./useMediaPlayerPlayerTabStyles";
 
 type MediaPlayerPlayerTabProps = Readonly<{
   isFocused: boolean;
@@ -61,10 +61,10 @@ export function MediaPlayerPlayerTab({
   const [pipActive, setPipActive] = useState(false);
 
   const source = useMemo(() => {
-    if (playbackMode === 'offline' && localOfflinePath) {
+    if (playbackMode === "offline" && localOfflinePath) {
       return buildLocalVideoSource(localOfflinePath);
     }
-    if (playbackMode === 'drm-demo') {
+    if (playbackMode === "drm-demo") {
       return buildDemoDrmSource();
     }
     return buildDemoClearHlsSource();
@@ -103,10 +103,10 @@ export function MediaPlayerPlayerTab({
         <Pressable
           style={[
             styles.modeBtn,
-            playbackMode === 'clear-hls' && styles.modeBtnActive,
+            playbackMode === "clear-hls" && styles.modeBtnActive,
           ]}
           onPress={() => {
-            onPlaybackModeChange('clear-hls');
+            onPlaybackModeChange("clear-hls");
             onErrorMessage(null);
             onBufferingChange(true);
           }}
@@ -114,7 +114,7 @@ export function MediaPlayerPlayerTab({
           <Text
             style={[
               styles.modeBtnText,
-              playbackMode === 'clear-hls' && styles.modeBtnTextActive,
+              playbackMode === "clear-hls" && styles.modeBtnTextActive,
             ]}
           >
             Clear HLS
@@ -123,10 +123,10 @@ export function MediaPlayerPlayerTab({
         <Pressable
           style={[
             styles.modeBtn,
-            playbackMode === 'drm-demo' && styles.modeBtnActive,
+            playbackMode === "drm-demo" && styles.modeBtnActive,
           ]}
           onPress={() => {
-            onPlaybackModeChange('drm-demo');
+            onPlaybackModeChange("drm-demo");
             onErrorMessage(null);
             onBufferingChange(true);
           }}
@@ -134,7 +134,7 @@ export function MediaPlayerPlayerTab({
           <Text
             style={[
               styles.modeBtnText,
-              playbackMode === 'drm-demo' && styles.modeBtnTextActive,
+              playbackMode === "drm-demo" && styles.modeBtnTextActive,
             ]}
           >
             DRM demo
@@ -143,10 +143,10 @@ export function MediaPlayerPlayerTab({
         <Pressable
           style={[
             styles.modeBtn,
-            playbackMode === 'offline' && styles.modeBtnActive,
+            playbackMode === "offline" && styles.modeBtnActive,
           ]}
           onPress={() => {
-            onPlaybackModeChange('offline');
+            onPlaybackModeChange("offline");
             onErrorMessage(null);
             onBufferingChange(true);
           }}
@@ -154,7 +154,7 @@ export function MediaPlayerPlayerTab({
           <Text
             style={[
               styles.modeBtnText,
-              playbackMode === 'offline' && styles.modeBtnTextActive,
+              playbackMode === "offline" && styles.modeBtnTextActive,
             ]}
           >
             Offline file
@@ -174,8 +174,8 @@ export function MediaPlayerPlayerTab({
             resizeMode="contain"
             enterPictureInPictureOnLeave
             playInBackground
-            hideShutterView={Platform.OS === 'android'}
-            shutterColor={Platform.OS === 'android' ? '#00000000' : undefined}
+            hideShutterView={Platform.OS === "android"}
+            shutterColor={Platform.OS === "android" ? "#00000000" : undefined}
             onPictureInPictureStatusChanged={onPictureInPictureStatusChanged}
             onLoadStart={() => {
               onBufferingChange(true);
@@ -189,11 +189,11 @@ export function MediaPlayerPlayerTab({
               onBufferingChange(false);
               const err = e.error;
               const msg =
-                err && typeof err.errorString === 'string'
+                err && typeof err.errorString === "string"
                   ? err.errorString
-                  : typeof err?.localizedDescription === 'string'
+                  : typeof err?.localizedDescription === "string"
                   ? err.localizedDescription
-                  : 'Playback error';
+                  : "Playback error";
               onErrorMessage(msg);
             }}
           />
@@ -232,18 +232,18 @@ export function MediaPlayerPlayerTab({
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      {Platform.OS === 'android' && playbackMode === 'drm-demo' ? (
+      {Platform.OS === "android" && playbackMode === "drm-demo" ? (
         <Text style={styles.hint}>
           Android: <Text style={styles.mono}>DRMType.WIDEVINE</Text> + DASH (
           <Text style={styles.mono}>format: &apos;dash&apos;</Text>).
         </Text>
       ) : null}
-      {Platform.OS === 'ios' && playbackMode === 'drm-demo' ? (
+      {Platform.OS === "ios" && playbackMode === "drm-demo" ? (
         <Text style={styles.hint}>
-          iOS: <Text style={styles.mono}>DRMType.FAIRPLAY</Text> with EZDRM public demo assets (
-          <Text style={styles.mono}>certificateUrl</Text>,{" "}
-          <Text style={styles.mono}>licenseServer</Text>). Use a physical device; swap URLs for your
-          DRM vendor before production.
+          iOS: <Text style={styles.mono}>DRMType.FAIRPLAY</Text> with EZDRM
+          public demo assets (<Text style={styles.mono}>certificateUrl</Text>,{" "}
+          <Text style={styles.mono}>licenseServer</Text>). Use a physical
+          device; swap URLs for your DRM vendor before production.
         </Text>
       ) : null}
     </ScrollView>

@@ -37,8 +37,7 @@ export function LoadingOverlay({ config }: LoadingOverlayProps) {
     return null;
   }
 
-  const size =
-    config.size === "small" ? 24 : config.size === "large" ? 48 : 36;
+  const size = config.size === "small" ? 24 : config.size === "large" ? 48 : 36;
 
   const renderLoadingIndicator = () => {
     switch (config.variant) {
@@ -71,7 +70,9 @@ export function LoadingOverlay({ config }: LoadingOverlayProps) {
         <View style={styles.content}>
           {renderLoadingIndicator()}
           {config.message ? (
-            <Text style={[styles.message, { color: config.color || "#FFFFFF" }]}>
+            <Text
+              style={[styles.message, { color: config.color || "#FFFFFF" }]}
+            >
               {config.message}
             </Text>
           ) : null}

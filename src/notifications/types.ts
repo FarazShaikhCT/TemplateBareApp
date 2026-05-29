@@ -11,7 +11,7 @@ export interface LocalNotification {
 export interface AndroidNotificationOptions {
   channelId?: string;
   sound?: string;
-  importance?: 'default' | 'high' | 'low' | 'min';
+  importance?: "default" | "high" | "low" | "min";
   smallIcon?: string;
   largeIcon?: string;
   color?: string;
@@ -43,7 +43,7 @@ export interface NotificationAction {
 
 export interface NotificationSchedule {
   timestamp: number;
-  repeatFrequency?: 'hourly' | 'daily' | 'weekly';
+  repeatFrequency?: "hourly" | "daily" | "weekly";
   allowWhileIdle?: boolean;
 }
 
@@ -56,16 +56,16 @@ export interface PushNotificationData {
 }
 
 export type NotificationPermissionStatus =
-  | 'authorized'
-  | 'denied'
-  | 'notDetermined'
-  | 'provisional';
+  | "authorized"
+  | "denied"
+  | "notDetermined"
+  | "provisional";
 
 export interface NotificationChannel {
   id: string;
   name: string;
   description?: string;
-  importance?: 'default' | 'high' | 'low' | 'min';
+  importance?: "default" | "high" | "low" | "min";
   sound?: string;
   vibration?: boolean;
   badge?: boolean;

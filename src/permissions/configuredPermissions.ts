@@ -9,7 +9,7 @@
  *   4. Update ios/Podfile setup_permissions([...]) and ios/<AppName>/Info.plist
  *   5. Update android/app/src/main/AndroidManifest.xml
  */
-import { PermissionKey } from './types';
+import { PermissionKey } from "./types";
 
 export interface ConfiguredPermission {
   label: string;
@@ -17,9 +17,9 @@ export interface ConfiguredPermission {
 }
 
 export const CONFIGURED_PERMISSIONS: ConfiguredPermission[] = [
-  { label: 'Camera', key: PermissionKey.Camera },
-  { label: 'Microphone', key: PermissionKey.Microphone },
-  { label: 'Location (When In Use)', key: PermissionKey.LocationWhenInUse },
-  { label: 'Photo Library', key: PermissionKey.PhotoLibrary },
-  { label: 'Contacts', key: PermissionKey.Contacts },
+  { label: "Camera", key: PermissionKey.Camera },
+  { label: "Microphone", key: PermissionKey.Microphone },
+  { label: "Location (When In Use)", key: PermissionKey.LocationWhenInUse },
+  { label: "Photo Library", key: PermissionKey.PhotoLibrary },
+  { label: "Contacts", key: PermissionKey.Contacts },
 ];

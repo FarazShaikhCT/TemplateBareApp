@@ -4,41 +4,41 @@ export type {
   StreamingFormat,
   MediaPlayerSourceInput,
   DownloadProgress,
-} from './types';
+} from "./types";
 
-export { DRMType } from './types';
+export { DRMType } from "./types";
 
 export {
   buildLocalVideoSource,
   buildRemoteVideoSource,
   withDrm,
-} from './buildMediaSource';
+} from "./buildMediaSource";
 export {
   DEMO_OFFLINE_PROGRESSIVE_MP4_URI,
   OFFLINE_DEMO_FILE_NAME,
   getOfflineDemoDirectoryPath,
   getOfflineDemoFilePath,
-} from './demoOfflineSources';
-export { DOWNLOAD_CATALOG, type CatalogItem } from './downloadCatalog';
+} from "./demoOfflineSources";
+export { DOWNLOAD_CATALOG, type CatalogItem } from "./downloadCatalog";
 export {
   clearDownloadNotification,
   requestDownloadNotificationPermission,
   showDownloadFinishedNotification,
   showDownloadPausedNotification,
   showDownloadProgressNotification,
-} from './downloadNotifications';
-export { getQueuedVideosDirectory } from './downloadQueuePaths';
+} from "./downloadNotifications";
+export { getQueuedVideosDirectory } from "./downloadQueuePaths";
 export {
   useSequentialDownloadQueue,
   type QueueItemRow,
   type QueueItemStatus,
-} from './useSequentialDownloadQueue';
+} from "./useSequentialDownloadQueue";
 export {
   buildDemoClearHlsSource,
   buildDemoDrmSource,
   DEMO_CLEAR_HLS_URI,
-} from './demoDrmSources';
-export { fileUriFromPath } from './fileUri';
+} from "./demoDrmSources";
+export { fileUriFromPath } from "./fileUri";
 export {
   deleteMediaFile,
   deleteResumeSidecarsForDestination,
@@ -51,8 +51,8 @@ export {
   type CancellableProgressiveDownload,
   type DownloadStreamOptions,
   type DownloadStreamResult,
-} from './download';
+} from "./download";
 
-export { MediaPlayer, type MediaPlayerProps } from './MediaPlayer';
+export { MediaPlayer, type MediaPlayerProps } from "./MediaPlayer";
 
-export type { VideoRef } from 'react-native-video';
+export type { VideoRef } from "react-native-video";

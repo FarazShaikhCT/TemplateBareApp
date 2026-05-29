@@ -1,5 +1,6 @@
 import { useRef, useCallback } from "react";
 import type { NavigationContainerRef } from "@react-navigation/native";
+import type { RootStackParamList } from "../navigation/types";
 import { logScreenView } from "./analytics";
 
 /**
@@ -13,8 +14,9 @@ import { logScreenView } from "./analytics";
  * ```
  */
 export function useAnalyticsScreenTracking() {
-  const navigationRef = useRef<NavigationContainerRef<{}>>(null);
-  const routeNameRef = useRef<string | undefined>();
+  const navigationRef =
+    useRef<NavigationContainerRef<RootStackParamList>>(null);
+  const routeNameRef = useRef<string | undefined>(undefined);
 
   const onReady = useCallback(() => {
     routeNameRef.current = navigationRef.current?.getCurrentRoute()?.name;

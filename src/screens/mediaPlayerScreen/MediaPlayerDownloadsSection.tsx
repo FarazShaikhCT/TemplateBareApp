@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
@@ -6,12 +6,12 @@ import {
   ActivityIndicator,
   ScrollView,
   Pressable,
-} from 'react-native';
+} from "react-native";
 
-import type { QueueItemRow } from '../../mediaPlayer';
-import { useThemedStyles } from '../../theme/useThemedStyles';
+import type { QueueItemRow } from "../../mediaPlayer";
+import { useThemedStyles } from "../../theme/useThemedStyles";
 
-import { progressPercent, statusLabel } from './mediaPlayerDownloads.utils';
+import { progressPercent, statusLabel } from "./mediaPlayerDownloads.utils";
 
 type MediaPlayerDownloadsSectionProps = Readonly<{
   rowsReady: boolean;
@@ -45,11 +45,11 @@ export function MediaPlayerDownloadsSection({
       },
       center: {
         paddingVertical: 32,
-        alignItems: 'center',
+        alignItems: "center",
       },
       row: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         paddingVertical: 12,
         paddingHorizontal: 12,
         marginBottom: 10,
@@ -63,8 +63,8 @@ export function MediaPlayerDownloadsSection({
       },
       iconCol: {
         width: 44,
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: "center",
+        justifyContent: "center",
       },
       iconText: {
         fontSize: 22,
@@ -75,7 +75,7 @@ export function MediaPlayerDownloadsSection({
       },
       rowTitle: {
         fontSize: 15,
-        fontWeight: '600',
+        fontWeight: "600",
         color: colors.text1,
       },
       subtitle: {
@@ -84,16 +84,16 @@ export function MediaPlayerDownloadsSection({
         marginTop: 4,
       },
       actions: {
-        flexDirection: 'column',
+        flexDirection: "column",
         gap: 6,
-        alignItems: 'stretch',
+        alignItems: "stretch",
       },
       btn: {
         paddingVertical: 8,
         paddingHorizontal: 10,
         borderRadius: 8,
         backgroundColor: colors.primary,
-        alignItems: 'center',
+        alignItems: "center",
       },
       btnMuted: {
         backgroundColor: colors.grayBackground,
@@ -101,13 +101,13 @@ export function MediaPlayerDownloadsSection({
         borderColor: colors.text2,
       },
       btnDanger: {
-        backgroundColor: 'transparent',
+        backgroundColor: "transparent",
         borderWidth: 1,
         borderColor: colors.error,
       },
       btnText: {
         fontSize: 12,
-        fontWeight: '600',
+        fontWeight: "600",
         color: colors.textOnPrimary,
       },
       btnTextMuted: {
@@ -121,10 +121,10 @@ export function MediaPlayerDownloadsSection({
         borderRadius: 2,
         backgroundColor: colors.background,
         marginTop: 8,
-        overflow: 'hidden',
+        overflow: "hidden",
       },
       progressFill: {
-        height: '100%',
+        height: "100%",
         borderRadius: 2,
         backgroundColor: colors.primary,
       },
@@ -159,23 +159,23 @@ export function MediaPlayerDownloadsSection({
       {rows.map(row => {
         const pct = progressPercent(row);
         const canQueue =
-          row.status === 'idle' ||
-          row.status === 'paused' ||
-          row.status === 'error';
-        const isDownloaded = row.status === 'downloaded';
-        const isDownloading = row.status === 'downloading';
+          row.status === "idle" ||
+          row.status === "paused" ||
+          row.status === "error";
+        const isDownloaded = row.status === "downloaded";
+        const isDownloading = row.status === "downloading";
 
         const body = (
           <>
             <View style={styles.iconCol}>
-              {row.status === 'idle' ||
-              row.status === 'error' ||
-              row.status === 'paused' ? (
+              {row.status === "idle" ||
+              row.status === "error" ||
+              row.status === "paused" ? (
                 <Text style={styles.iconText} accessibilityLabel="Download">
                   ⬇
                 </Text>
               ) : null}
-              {row.status === 'queued' ? (
+              {row.status === "queued" ? (
                 <Text
                   style={styles.iconText}
                   accessibilityLabel="Waiting in queue"
@@ -183,13 +183,13 @@ export function MediaPlayerDownloadsSection({
                   ⋯
                 </Text>
               ) : null}
-              {row.status === 'downloading' ? (
+              {row.status === "downloading" ? (
                 <ActivityIndicator
                   color="#888"
                   accessibilityLabel="Downloading"
                 />
               ) : null}
-              {row.status === 'downloaded' ? (
+              {row.status === "downloaded" ? (
                 <Text style={styles.iconText} accessibilityLabel="Downloaded">
                   ✓
                 </Text>

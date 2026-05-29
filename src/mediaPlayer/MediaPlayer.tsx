@@ -1,6 +1,6 @@
-import React, { forwardRef } from 'react';
-import Video from 'react-native-video';
-import type { ReactVideoProps, VideoRef } from 'react-native-video';
+import React, { forwardRef } from "react";
+import Video from "react-native-video";
+import type { ReactVideoProps, VideoRef } from "react-native-video";
 
 export type MediaPlayerProps = ReactVideoProps;
 

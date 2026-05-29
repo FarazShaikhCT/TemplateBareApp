@@ -1,17 +1,17 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
   ScrollView,
   Pressable,
   ActivityIndicator,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useThemedStyles } from '../theme/useThemedStyles';
-import { usePermission } from '../permissions';
-import type { PermissionKey, PermissionStatus } from '../permissions/types';
-import { CONFIGURED_PERMISSIONS } from '../permissions/configuredPermissions';
-import { AppColors } from '../theme/AppColors';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useThemedStyles } from "../theme/useThemedStyles";
+import { usePermission } from "../permissions";
+import type { PermissionKey, PermissionStatus } from "../permissions/types";
+import { CONFIGURED_PERMISSIONS } from "../permissions/configuredPermissions";
+import { AppColors } from "../theme/AppColors";
 
 interface PermissionRowProps {
   label: string;
@@ -23,11 +23,11 @@ function statusColor(
   colors: AppColors,
 ): string {
   switch (status) {
-    case 'granted':
+    case "granted":
       return colors.success;
-    case 'blocked':
+    case "blocked":
       return colors.error;
-    case 'denied':
+    case "denied":
       return colors.secondary;
     default:
       return colors.text2;
@@ -35,14 +35,15 @@ function statusColor(
 }
 
 function PermissionRow({ label, permissionKey }: PermissionRowProps) {
-  const { status, isLoading, request, openSettings } = usePermission(permissionKey);
+  const { status, isLoading, request, openSettings } =
+    usePermission(permissionKey);
 
-  const styles = useThemedStyles((colors) => ({
+  const styles = useThemedStyles(colors => ({
     row: {
-      width: '100%' as const,
-      flexDirection: 'row' as const,
-      alignItems: 'center' as const,
-      justifyContent: 'space-between' as const,
+      width: "100%" as const,
+      flexDirection: "row" as const,
+      alignItems: "center" as const,
+      justifyContent: "space-between" as const,
       paddingVertical: 14,
       paddingHorizontal: 16,
       borderRadius: 12,
@@ -51,13 +52,13 @@ function PermissionRow({ label, permissionKey }: PermissionRowProps) {
     },
     label: {
       fontSize: 15,
-      fontWeight: '500' as const,
+      fontWeight: "500" as const,
       color: colors.primary,
       flex: 1,
     },
     statusText: {
       fontSize: 13,
-      fontWeight: '600' as const,
+      fontWeight: "600" as const,
       color: statusColor(status, colors),
       marginRight: 12,
     },
@@ -70,12 +71,12 @@ function PermissionRow({ label, permissionKey }: PermissionRowProps) {
     buttonText: {
       color: colors.textOnPrimary,
       fontSize: 13,
-      fontWeight: '600' as const,
+      fontWeight: "600" as const,
     },
   }));
 
   const handlePress = () => {
-    if (status === 'blocked') {
+    if (status === "blocked") {
       openSettings();
     } else {
       request();
@@ -83,11 +84,11 @@ function PermissionRow({ label, permissionKey }: PermissionRowProps) {
   };
 
   const actionLabel =
-    status === 'granted'
-      ? 'Granted'
-      : status === 'blocked'
-        ? 'Open Settings'
-        : 'Request';
+    status === "granted"
+      ? "Granted"
+      : status === "blocked"
+      ? "Open Settings"
+      : "Request";
 
   return (
     <View style={styles.row}>
@@ -95,12 +96,12 @@ function PermissionRow({ label, permissionKey }: PermissionRowProps) {
       {isLoading ? (
         <ActivityIndicator size="small" style={{ marginRight: 12 }} />
       ) : (
-        <Text style={styles.statusText}>{status ?? '—'}</Text>
+        <Text style={styles.statusText}>{status ?? "—"}</Text>
       )}
       <Pressable
         style={styles.button}
         onPress={handlePress}
-        disabled={status === 'granted' || isLoading}
+        disabled={status === "granted" || isLoading}
       >
         <Text style={styles.buttonText}>{actionLabel}</Text>
       </Pressable>
@@ -109,7 +110,7 @@ function PermissionRow({ label, permissionKey }: PermissionRowProps) {
 }
 
 export function PermissionsDemoScreen() {
-  const styles = useThemedStyles((colors) => ({
+  const styles = useThemedStyles(colors => ({
     safeArea: {
       flex: 1,
       backgroundColor: colors.background,
@@ -120,7 +121,7 @@ export function PermissionsDemoScreen() {
     },
     title: {
       fontSize: 28,
-      fontWeight: '700' as const,
+      fontWeight: "700" as const,
       color: colors.text1,
       marginBottom: 8,
     },
@@ -132,9 +133,9 @@ export function PermissionsDemoScreen() {
     },
     sectionHeading: {
       fontSize: 12,
-      fontWeight: '600' as const,
+      fontWeight: "600" as const,
       color: colors.text2,
-      textTransform: 'uppercase' as const,
+      textTransform: "uppercase" as const,
       letterSpacing: 0.8,
       marginBottom: 12,
     },
@@ -166,19 +167,19 @@ export function PermissionsDemoScreen() {
         ) : (
           <View style={styles.placeholder}>
             <Text style={styles.placeholderText}>
-              No permissions configured. Open{' '}
-              <Text style={{ fontWeight: '700' }}>
+              No permissions configured. Open{" "}
+              <Text style={{ fontWeight: "700" }}>
                 src/permissions/configuredPermissions.ts
-              </Text>{' '}
-              and add entries to{' '}
-              <Text style={{ fontWeight: '700' }}>CONFIGURED_PERMISSIONS</Text>
-              , then extend{' '}
-              <Text style={{ fontWeight: '700' }}>PermissionKey</Text> in{' '}
-              <Text style={{ fontWeight: '700' }}>
+              </Text>{" "}
+              and add entries to{" "}
+              <Text style={{ fontWeight: "700" }}>CONFIGURED_PERMISSIONS</Text>,
+              then extend{" "}
+              <Text style={{ fontWeight: "700" }}>PermissionKey</Text> in{" "}
+              <Text style={{ fontWeight: "700" }}>
                 src/permissions/types.ts
-              </Text>{' '}
-              and add the platform mapping in{' '}
-              <Text style={{ fontWeight: '700' }}>
+              </Text>{" "}
+              and add the platform mapping in{" "}
+              <Text style={{ fontWeight: "700" }}>
                 src/permissions/PermissionsManager.ts
               </Text>
               .

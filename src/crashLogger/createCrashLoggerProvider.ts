@@ -1,5 +1,5 @@
-import { FirebaseCrashlyticsProvider } from './providers/firebase/FirebaseCrashlyticsProvider';
-import type { ICrashLoggerProvider } from './providers/ICrashLoggerProvider';
+import { FirebaseCrashlyticsProvider } from "./providers/firebase/FirebaseCrashlyticsProvider";
+import type { ICrashLoggerProvider } from "./providers/ICrashLoggerProvider";
 
 /**
  * Returns the active crash logging implementation.

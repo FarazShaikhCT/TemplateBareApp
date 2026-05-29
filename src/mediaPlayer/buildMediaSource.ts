@@ -1,17 +1,17 @@
-import type { Drm, ReactVideoSource } from 'react-native-video';
-import type { MediaPlayerSourceInput, StreamingFormat } from './types';
-import { fileUriFromPath } from './fileUri';
+import type { Drm, ReactVideoSource } from "react-native-video";
+import type { MediaPlayerSourceInput, StreamingFormat } from "./types";
+import { fileUriFromPath } from "./fileUri";
 
 const FORMAT_TO_SOURCE_TYPE: Record<StreamingFormat, string> = {
-  hls: 'm3u8',
-  dash: 'mpd',
-  smoothStreaming: 'ism',
+  hls: "m3u8",
+  dash: "mpd",
+  smoothStreaming: "ism",
 };
 
 function assertNonEmptyUri(uri: string): void {
   const t = uri.trim();
   if (t.length === 0) {
-    throw new Error('mediaPlayer: uri must be a non-empty string');
+    throw new Error("mediaPlayer: uri must be a non-empty string");
   }
 }
 
@@ -21,10 +21,10 @@ function validateHttpUrl(uri: string): void {
   try {
     parsed = new URL(uri);
   } catch {
-    throw new Error('mediaPlayer: uri must be an absolute URL for this helper');
+    throw new Error("mediaPlayer: uri must be an absolute URL for this helper");
   }
-  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
-    throw new Error('mediaPlayer: uri must use http or https');
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    throw new Error("mediaPlayer: uri must use http or https");
   }
 }
 
@@ -47,7 +47,7 @@ export function buildRemoteVideoSource(
       ? { headers: { ...input.headers } }
       : {}),
   };
-  if (input.format && input.format !== 'progressive') {
+  if (input.format && input.format !== "progressive") {
     return {
       ...base,
       type: FORMAT_TO_SOURCE_TYPE[input.format],
@@ -64,7 +64,7 @@ export function withDrm(source: ReactVideoSource, drm: Drm): ReactVideoSource {
 
 function attachDrm(drm: Drm): Drm {
   if (!drm.type) {
-    throw new Error('mediaPlayer: drm.type is required when drm is provided');
+    throw new Error("mediaPlayer: drm.type is required when drm is provided");
   }
   return drm;
 }

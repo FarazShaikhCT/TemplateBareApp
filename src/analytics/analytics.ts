@@ -1,4 +1,4 @@
-import { createAnalyticsProvider } from './createAnalyticsProvider';
+import { createAnalyticsProvider } from "./createAnalyticsProvider";
 
 const analyticsProvider = createAnalyticsProvider();
 

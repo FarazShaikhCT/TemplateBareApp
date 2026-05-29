@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,8 +8,8 @@ import {
   Animated,
   Dimensions,
   Platform,
-} from 'react-native';
-import type { AlertConfig } from './types';
+} from "react-native";
+import type { AlertConfig } from "./types";
 
 interface AlertProps {
   config: AlertConfig | null;
@@ -60,8 +60,8 @@ export function Alert({ config, onDismiss }: AlertProps) {
 
   if (!config) return null;
 
-  const buttons = config.buttons || [{ text: 'OK', onPress: handleDismiss }];
-  const iconColor = getIconColor(config.type || 'info');
+  const buttons = config.buttons || [{ text: "OK", onPress: handleDismiss }];
+  const iconColor = getIconColor(config.type || "info");
 
   return (
     <Modal transparent visible animationType="none">
@@ -77,7 +77,7 @@ export function Alert({ config, onDismiss }: AlertProps) {
         >
           <View style={[styles.iconContainer, { backgroundColor: iconColor }]}>
             <Text style={styles.iconText}>
-              {getIcon(config.type || 'info')}
+              {getIcon(config.type || "info")}
             </Text>
           </View>
           <Text style={styles.title}>{config.title}</Text>
@@ -88,8 +88,8 @@ export function Alert({ config, onDismiss }: AlertProps) {
                 key={index}
                 style={({ pressed }) => [
                   styles.button,
-                  button.style === 'cancel' && styles.buttonCancel,
-                  button.style === 'destructive' && styles.buttonDestructive,
+                  button.style === "cancel" && styles.buttonCancel,
+                  button.style === "destructive" && styles.buttonDestructive,
                   pressed && styles.buttonPressed,
                   buttons.length > 1 && index > 0 && styles.buttonMargin,
                 ]}
@@ -101,8 +101,8 @@ export function Alert({ config, onDismiss }: AlertProps) {
                 <Text
                   style={[
                     styles.buttonText,
-                    button.style === 'cancel' && styles.buttonTextCancel,
-                    button.style === 'destructive' &&
+                    button.style === "cancel" && styles.buttonTextCancel,
+                    button.style === "destructive" &&
                       styles.buttonTextDestructive,
                   ]}
                 >
@@ -119,33 +119,33 @@ export function Alert({ config, onDismiss }: AlertProps) {
 
 function getIcon(type: string): string {
   switch (type) {
-    case 'success':
-      return '✓';
-    case 'error':
-      return '✕';
-    case 'warning':
-      return '⚠';
-    case 'info':
+    case "success":
+      return "✓";
+    case "error":
+      return "✕";
+    case "warning":
+      return "⚠";
+    case "info":
     default:
-      return 'i';
+      return "i";
   }
 }
 
 function getIconColor(type: string): string {
   switch (type) {
-    case 'success':
-      return '#4CAF50';
-    case 'error':
-      return '#F44336';
-    case 'warning':
-      return '#FF9800';
-    case 'info':
+    case "success":
+      return "#4CAF50";
+    case "error":
+      return "#F44336";
+    case "warning":
+      return "#FF9800";
+    case "info":
     default:
-      return '#2196F3';
+      return "#2196F3";
   }
 }
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   overlay: {
@@ -153,23 +153,23 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   centeredView: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
   alertBox: {
     width: Math.min(width - 80, 340),
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderRadius: 16,
     padding: 24,
-    alignItems: 'center',
+    alignItems: "center",
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
+        shadowColor: "#000",
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.2,
         shadowRadius: 16,
@@ -183,47 +183,47 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 16,
   },
   iconText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 28,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   title: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#000000',
+    fontWeight: "700",
+    color: "#000000",
     marginBottom: 8,
-    textAlign: 'center',
+    textAlign: "center",
   },
   message: {
     fontSize: 14,
-    color: '#666666',
+    color: "#666666",
     lineHeight: 20,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 24,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    width: '100%',
+    flexDirection: "row",
+    width: "100%",
   },
   button: {
     flex: 1,
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
-    backgroundColor: '#2196F3',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#2196F3",
+    alignItems: "center",
+    justifyContent: "center",
   },
   buttonCancel: {
-    backgroundColor: '#E0E0E0',
+    backgroundColor: "#E0E0E0",
   },
   buttonDestructive: {
-    backgroundColor: '#F44336',
+    backgroundColor: "#F44336",
   },
   buttonPressed: {
     opacity: 0.7,
@@ -233,13 +233,13 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#FFFFFF',
+    fontWeight: "600",
+    color: "#FFFFFF",
   },
   buttonTextCancel: {
-    color: '#000000',
+    color: "#000000",
   },
   buttonTextDestructive: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
   },
 });

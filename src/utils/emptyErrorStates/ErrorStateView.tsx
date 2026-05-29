@@ -27,9 +27,11 @@ export function ErrorStateView({
   const fullscreen = layout === "fullscreen";
 
   const styles = useThemedStyles(
-    (c) => ({
+    c => ({
       root: {
-        ...(fullscreen ? { flex: 1 as const, justifyContent: "center" as const } : {}),
+        ...(fullscreen
+          ? { flex: 1 as const, justifyContent: "center" as const }
+          : {}),
         alignItems: "center",
         paddingHorizontal: SpacingToken.spacing_value_6,
         paddingVertical: SpacingToken.spacing_value_8,
@@ -98,7 +100,10 @@ export function ErrorStateView({
       ) : null}
       {retryLabel && onRetry ? (
         <Pressable
-          style={({ pressed }) => [styles.retryButton, pressed && { opacity: 0.88 }]}
+          style={({ pressed }) => [
+            styles.retryButton,
+            pressed && { opacity: 0.88 },
+          ]}
           onPress={onRetry}
           accessibilityRole="button"
           accessibilityLabel={retryLabel}

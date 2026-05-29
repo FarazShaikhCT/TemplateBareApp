@@ -5,16 +5,20 @@ import {
   PERMISSIONS,
   RESULTS,
   Permission,
-} from 'react-native-permissions';
-import { Platform } from 'react-native';
-import type { PermissionKey, PermissionResult, PermissionStatus } from './types';
+} from "react-native-permissions";
+import { Platform } from "react-native";
+import type {
+  PermissionKey,
+  PermissionResult,
+  PermissionStatus,
+} from "./types";
 
 /**
  * Maps a PermissionKey to the platform-specific react-native-permissions constant.
  * Extend this map when new PermissionKey values are added to types.ts.
  */
 function resolvePermission(key: PermissionKey): Permission | null {
-  if (Platform.OS === 'ios') {
+  if (Platform.OS === "ios") {
     const iosMap: Partial<Record<PermissionKey, Permission>> = {
       camera: PERMISSIONS.IOS.CAMERA,
       microphone: PERMISSIONS.IOS.MICROPHONE,
@@ -25,7 +29,7 @@ function resolvePermission(key: PermissionKey): Permission | null {
     return iosMap[key] ?? null;
   }
 
-  if (Platform.OS === 'android') {
+  if (Platform.OS === "android") {
     const androidMap: Partial<Record<PermissionKey, Permission>> = {
       camera: PERMISSIONS.ANDROID.CAMERA,
       microphone: PERMISSIONS.ANDROID.RECORD_AUDIO,
@@ -42,17 +46,17 @@ function resolvePermission(key: PermissionKey): Permission | null {
 function normalizeStatus(raw: string): PermissionStatus {
   switch (raw) {
     case RESULTS.UNAVAILABLE:
-      return 'unavailable';
+      return "unavailable";
     case RESULTS.BLOCKED:
-      return 'blocked';
+      return "blocked";
     case RESULTS.DENIED:
-      return 'denied';
+      return "denied";
     case RESULTS.LIMITED:
-      return 'limited';
+      return "limited";
     case RESULTS.GRANTED:
-      return 'granted';
+      return "granted";
     default:
-      return 'denied';
+      return "denied";
   }
 }
 
@@ -62,7 +66,7 @@ export const PermissionsManager = {
    */
   async checkPermission(key: PermissionKey): Promise<PermissionResult> {
     const permission = resolvePermission(key);
-    if (!permission) return { key, status: 'unavailable' };
+    if (!permission) return { key, status: "unavailable" };
     const raw = await check(permission);
     return { key, status: normalizeStatus(raw) };
   },
@@ -73,7 +77,7 @@ export const PermissionsManager = {
    */
   async requestPermission(key: PermissionKey): Promise<PermissionResult> {
     const permission = resolvePermission(key);
-    if (!permission) return { key, status: 'unavailable' };
+    if (!permission) return { key, status: "unavailable" };
     const raw = await request(permission);
     return { key, status: normalizeStatus(raw) };
   },

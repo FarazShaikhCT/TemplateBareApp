@@ -1,5 +1,5 @@
-export { NotificationsProvider } from './NotificationsProvider';
-export { NotificationManager } from './NotificationManager';
+export { NotificationsProvider } from "./NotificationsProvider";
+export { NotificationManager } from "./NotificationManager";
 export type {
   LocalNotification,
   AndroidNotificationOptions,
@@ -9,4 +9,4 @@ export type {
   PushNotificationData,
   NotificationPermissionStatus,
   NotificationChannel,
-} from './types';
+} from "./types";

@@ -1,17 +1,17 @@
-import notifee, { AndroidImportance } from '@notifee/react-native';
-import { Platform } from 'react-native';
+import notifee, { AndroidImportance } from "@notifee/react-native";
+import { Platform } from "react-native";
 
-const ANDROID_CHANNEL_ID = 'mediaPlayerDownloads';
+const ANDROID_CHANNEL_ID = "mediaPlayerDownloads";
 
 let androidChannelReady = false;
 
 async function ensureAndroidChannel(): Promise<void> {
-  if (Platform.OS !== 'android' || androidChannelReady) {
+  if (Platform.OS !== "android" || androidChannelReady) {
     return;
   }
   await notifee.createChannel({
     id: ANDROID_CHANNEL_ID,
-    name: 'Media downloads',
+    name: "Media downloads",
     importance: AndroidImportance.DEFAULT,
   });
   androidChannelReady = true;
@@ -72,7 +72,7 @@ export async function showDownloadProgressNotification(
           current,
           indeterminate: !hasTotal,
         },
-        pressAction: { id: 'default' },
+        pressAction: { id: "default" },
       },
     });
   } catch {
@@ -89,13 +89,13 @@ export async function showDownloadPausedNotification(
     await notifee.displayNotification({
       id: notificationId(itemId),
       title: title.slice(0, 80),
-      body: 'Download paused — open the app to resume.',
+      body: "Download paused — open the app to resume.",
       android: {
         channelId: ANDROID_CHANNEL_ID,
         ongoing: false,
         onlyAlertOnce: true,
       },
-      ios: { sound: 'default' },
+      ios: { sound: "default" },
     });
   } catch {
     /* ignore */
@@ -113,12 +113,12 @@ export async function showDownloadFinishedNotification(
     await notifee.displayNotification({
       id: `${notificationId(itemId)}-done`,
       title: title.slice(0, 80),
-      body: ok ? 'Download complete' : 'Download failed',
+      body: ok ? "Download complete" : "Download failed",
       android: {
         channelId: ANDROID_CHANNEL_ID,
-        pressAction: { id: 'default' },
+        pressAction: { id: "default" },
       },
-      ios: { sound: 'default' },
+      ios: { sound: "default" },
     });
   } catch {
     /* ignore */

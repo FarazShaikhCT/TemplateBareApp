@@ -1,4 +1,4 @@
-import { createCrashLoggerProvider } from './createCrashLoggerProvider';
+import { createCrashLoggerProvider } from "./createCrashLoggerProvider";
 
 const provider = createCrashLoggerProvider();
 

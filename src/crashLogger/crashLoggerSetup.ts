@@ -1,4 +1,4 @@
-import { recordError } from './crashLogger';
+import { recordError } from "./crashLogger";
 
 /**
  * Registers global JS error handlers so unhandled exceptions and promise

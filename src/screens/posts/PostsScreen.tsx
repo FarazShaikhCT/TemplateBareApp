@@ -145,7 +145,7 @@ const PostsScreen = ({ navigation }: Props) => {
         ) : (
           <FlatList<Post>
             data={posts ?? []}
-            keyExtractor={(item) => String(item.id)}
+            keyExtractor={item => String(item.id)}
             renderItem={({ item }) => (
               <View style={styles.row}>
                 <Text style={styles.rowTitle}>{item.title}</Text>

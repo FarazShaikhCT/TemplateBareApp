@@ -27,9 +27,11 @@ export function EmptyStateView({
   const fullscreen = layout === "fullscreen";
 
   const styles = useThemedStyles(
-    (c) => ({
+    c => ({
       root: {
-        ...(fullscreen ? { flex: 1 as const, justifyContent: "center" as const } : {}),
+        ...(fullscreen
+          ? { flex: 1 as const, justifyContent: "center" as const }
+          : {}),
         alignItems: "center",
         paddingHorizontal: SpacingToken.spacing_value_6,
         paddingVertical: SpacingToken.spacing_value_12,
@@ -83,10 +85,15 @@ export function EmptyStateView({
         <Text style={styles.iconText}>{icon}</Text>
       </View>
       <Text style={styles.title}>{title}</Text>
-      {description ? <Text style={styles.description}>{description}</Text> : null}
+      {description ? (
+        <Text style={styles.description}>{description}</Text>
+      ) : null}
       {actionLabel && onActionPress ? (
         <Pressable
-          style={({ pressed }) => [styles.actionButton, pressed && { opacity: 0.88 }]}
+          style={({ pressed }) => [
+            styles.actionButton,
+            pressed && { opacity: 0.88 },
+          ]}
           onPress={onActionPress}
           accessibilityRole="button"
           accessibilityLabel={actionLabel}

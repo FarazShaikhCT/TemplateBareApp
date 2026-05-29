@@ -1,4 +1,4 @@
-import { useRemoteConfig } from '../remoteConfig/RemoteConfigContext';
+import { useRemoteConfig } from "../remoteConfig/RemoteConfigContext";
 
 export function useSettingsRemoteFlags() {
   const {

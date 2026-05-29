@@ -6,9 +6,9 @@ import {
   lastFetchStatus,
   setConfigSettings,
   setDefaults,
-} from '@react-native-firebase/remote-config';
+} from "@react-native-firebase/remote-config";
 
-import type { IRemoteConfigProvider } from '../IRemoteConfigProvider';
+import type { IRemoteConfigProvider } from "../IRemoteConfigProvider";
 
 /** Production default matches Firebase: avoid hammering the service in release builds. */
 const PRODUCTION_MIN_FETCH_INTERVAL_MS = 12 * 60 * 60 * 1000;
@@ -18,7 +18,9 @@ export class FirebaseRemoteConfigProvider implements IRemoteConfigProvider {
 
   private async applyFetchIntervalSettings(): Promise<void> {
     await setConfigSettings(this.rc, {
-      minimumFetchIntervalMillis: __DEV__ ? 0 : PRODUCTION_MIN_FETCH_INTERVAL_MS,
+      minimumFetchIntervalMillis: __DEV__
+        ? 0
+        : PRODUCTION_MIN_FETCH_INTERVAL_MS,
     });
   }
 
@@ -50,7 +52,7 @@ export class FirebaseRemoteConfigProvider implements IRemoteConfigProvider {
     try {
       return String(lastFetchStatus(this.rc));
     } catch {
-      return 'unknown';
+      return "unknown";
     }
   }
 

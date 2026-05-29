@@ -1,18 +1,18 @@
-import messaging from '@react-native-firebase/messaging';
-import { logger } from '../utils/logger';
+import messaging from "@react-native-firebase/messaging";
+import { logger } from "../utils/logger";
 import notifee, {
   AndroidImportance,
   AndroidNotificationSetting,
   AuthorizationStatus,
   EventType,
-} from '@notifee/react-native';
-import { Platform } from 'react-native';
+} from "@notifee/react-native";
+import { Platform } from "react-native";
 import type {
   LocalNotification,
   NotificationChannel,
   NotificationPermissionStatus,
   PushNotificationData,
-} from './types';
+} from "./types";
 
 /** @see @notifee/react-native/dist/types/Trigger.js — avoid named enum imports; Metro can bind them as undefined from CJS `__exportStar`. */
 const NOTIFEE_TRIGGER_TIMESTAMP = 0;
@@ -56,23 +56,23 @@ class NotificationManagerClass {
 
   private async createDefaultChannels() {
     await notifee.createChannel({
-      id: 'default',
-      name: 'Default',
+      id: "default",
+      name: "Default",
       importance: AndroidImportance.HIGH,
-      sound: 'default',
+      sound: "default",
     });
 
     await notifee.createChannel({
-      id: 'high-priority',
-      name: 'High Priority',
+      id: "high-priority",
+      name: "High Priority",
       importance: AndroidImportance.HIGH,
-      sound: 'default',
+      sound: "default",
       vibration: true,
     });
 
     await notifee.createChannel({
-      id: 'low-priority',
-      name: 'Low Priority',
+      id: "low-priority",
+      name: "Low Priority",
       importance: AndroidImportance.LOW,
     });
   }
@@ -83,11 +83,11 @@ class NotificationManagerClass {
 
       if (remoteMessage.notification) {
         await this.displayNotification({
-          title: remoteMessage.notification.title || '',
-          body: remoteMessage.notification.body || '',
+          title: remoteMessage.notification.title || "",
+          body: remoteMessage.notification.body || "",
           data: remoteMessage.data as Record<string, unknown>,
           android: {
-            channelId: 'default',
+            channelId: "default",
           },
         });
       }
@@ -105,7 +105,7 @@ class NotificationManagerClass {
         const data: PushNotificationData = {
           data: detail.notification.data as Record<string, string>,
         };
-          this.emitNotificationOpened(data);
+        this.emitNotificationOpened(data);
       }
     });
   }
@@ -130,9 +130,11 @@ class NotificationManagerClass {
     await messaging().requestPermission();
 
     const settings = await notifee.getNotificationSettings();
-    const status = this.mapNotifeeAuthorizationStatus(settings.authorizationStatus);
+    const status = this.mapNotifeeAuthorizationStatus(
+      settings.authorizationStatus,
+    );
 
-    if (status === 'authorized' || status === 'provisional') {
+    if (status === "authorized" || status === "provisional") {
       await messaging().registerDeviceForRemoteMessages();
     }
 
@@ -149,14 +151,14 @@ class NotificationManagerClass {
   ): NotificationPermissionStatus {
     switch (status) {
       case AuthorizationStatus.AUTHORIZED:
-        return 'authorized';
+        return "authorized";
       case AuthorizationStatus.PROVISIONAL:
-        return 'provisional';
+        return "provisional";
       case AuthorizationStatus.DENIED:
-        return 'denied';
+        return "denied";
       case AuthorizationStatus.NOT_DETERMINED:
       default:
-        return 'notDetermined';
+        return "notDetermined";
     }
   }
 
@@ -172,58 +174,79 @@ class NotificationManagerClass {
 
     try {
       const permissionStatus = await this.checkPermission();
-      if (permissionStatus === 'authorized' || permissionStatus === 'provisional') {
+      if (
+        permissionStatus === "authorized" ||
+        permissionStatus === "provisional"
+      ) {
         const isRegistered = messaging().isDeviceRegisteredForRemoteMessages;
         if (!isRegistered) {
           await messaging().registerDeviceForRemoteMessages();
         }
         this.fcmToken = await messaging().getToken();
-        logger.debug('FCM token:', this.fcmToken);
+        logger.debug("FCM token:", this.fcmToken);
         return this.fcmToken;
       }
     } catch (error) {
       this.lastFCMTokenFetchError = formatErrorForDiagnostics(error);
-      logger.warn('FCM token not available:', error);
+      logger.warn("FCM token not available:", error);
     }
 
     return null;
   }
 
   async displayNotification(notification: LocalNotification): Promise<string> {
-    const channelId = notification.android?.channelId || 'default';
+    const channelId = notification.android?.channelId || "default";
 
     const androidConfig: any = {
       channelId,
-      smallIcon: notification.android?.smallIcon || 'ic_launcher',
+      smallIcon: notification.android?.smallIcon || "ic_launcher",
       autoCancel: notification.android?.autoCancel ?? true,
       ongoing: notification.android?.ongoing ?? false,
       importance: this.mapImportance(notification.android?.importance),
     };
 
-    if (notification.android?.largeIcon && typeof notification.android.largeIcon === 'string') {
+    if (
+      notification.android?.largeIcon &&
+      typeof notification.android.largeIcon === "string"
+    ) {
       androidConfig.largeIcon = notification.android.largeIcon;
     }
-    if (notification.android?.color && typeof notification.android.color === 'string') {
+    if (
+      notification.android?.color &&
+      typeof notification.android.color === "string"
+    ) {
       androidConfig.color = notification.android.color;
     }
-    if (notification.android?.sound && typeof notification.android.sound === 'string') {
+    if (
+      notification.android?.sound &&
+      typeof notification.android.sound === "string"
+    ) {
       androidConfig.sound = notification.android.sound;
     }
-    if (notification.android?.actions && Array.isArray(notification.android.actions)) {
+    if (
+      notification.android?.actions &&
+      Array.isArray(notification.android.actions)
+    ) {
       androidConfig.actions = notification.android.actions;
     }
 
     const iosConfig: any = {};
-    if (notification.ios?.sound && typeof notification.ios.sound === 'string') {
+    if (notification.ios?.sound && typeof notification.ios.sound === "string") {
       iosConfig.sound = notification.ios.sound;
     }
-    if (notification.ios?.badge && typeof notification.ios.badge === 'number') {
+    if (notification.ios?.badge && typeof notification.ios.badge === "number") {
       iosConfig.badgeCount = notification.ios.badge;
     }
-    if (notification.ios?.categoryId && typeof notification.ios.categoryId === 'string') {
+    if (
+      notification.ios?.categoryId &&
+      typeof notification.ios.categoryId === "string"
+    ) {
       iosConfig.categoryId = notification.ios.categoryId;
     }
-    if (notification.ios?.attachments && Array.isArray(notification.ios.attachments)) {
+    if (
+      notification.ios?.attachments &&
+      Array.isArray(notification.ios.attachments)
+    ) {
       iosConfig.attachments = notification.ios.attachments;
     }
 
@@ -234,7 +257,11 @@ class NotificationManagerClass {
       ios: iosConfig,
     };
 
-    if (notification.id && typeof notification.id === 'string' && notification.id.trim().length > 0) {
+    if (
+      notification.id &&
+      typeof notification.id === "string" &&
+      notification.id.trim().length > 0
+    ) {
       notificationPayload.id = notification.id.trim();
     }
 
@@ -242,24 +269,26 @@ class NotificationManagerClass {
       notificationPayload.data = notification.data;
     }
 
-    const notificationId = await notifee.displayNotification(notificationPayload);
+    const notificationId = await notifee.displayNotification(
+      notificationPayload,
+    );
 
     return notificationId;
   }
 
-  async scheduleNotification(
-    notification: LocalNotification,
-  ): Promise<string> {
+  async scheduleNotification(notification: LocalNotification): Promise<string> {
     if (!notification.schedule) {
-      throw new Error('Schedule configuration is required for scheduled notifications');
+      throw new Error(
+        "Schedule configuration is required for scheduled notifications",
+      );
     }
 
     await ensureAndroidExactAlarmsAllowedForTriggers();
 
-    const channelId = notification.android?.channelId || 'default';
+    const channelId = notification.android?.channelId || "default";
 
     const notificationIdKey =
-      typeof notification.id === 'string' && notification.id.trim().length > 0
+      typeof notification.id === "string" && notification.id.trim().length > 0
         ? notification.id.trim()
         : `scheduled-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
 
@@ -279,10 +308,13 @@ class NotificationManagerClass {
     }
 
     const iosConfig: any = {};
-    if (notification.ios?.sound && typeof notification.ios.sound === 'string') {
+    if (notification.ios?.sound && typeof notification.ios.sound === "string") {
       iosConfig.sound = notification.ios.sound;
     }
-    if (notification.ios?.categoryId && typeof notification.ios.categoryId === 'string') {
+    if (
+      notification.ios?.categoryId &&
+      typeof notification.ios.categoryId === "string"
+    ) {
       iosConfig.categoryId = notification.ios.categoryId;
     }
 
@@ -291,10 +323,12 @@ class NotificationManagerClass {
         id: notificationIdKey,
         title: notification.title,
         body: notification.body,
-        data: notification.data,
+        data: notification.data as
+          | { [key: string]: string | number | object }
+          | undefined,
         android: {
           channelId,
-          smallIcon: notification.android?.smallIcon || 'ic_launcher',
+          smallIcon: notification.android?.smallIcon || "ic_launcher",
           importance: this.mapImportance(notification.android?.importance),
         },
         ios: iosConfig,
@@ -307,11 +341,11 @@ class NotificationManagerClass {
 
   private mapImportance(importance?: string): AndroidImportance {
     switch (importance) {
-      case 'high':
+      case "high":
         return AndroidImportance.HIGH;
-      case 'low':
+      case "low":
         return AndroidImportance.LOW;
-      case 'min':
+      case "min":
         return AndroidImportance.MIN;
       default:
         return AndroidImportance.DEFAULT;
@@ -320,11 +354,11 @@ class NotificationManagerClass {
 
   private mapRepeatFrequency(frequency: string): number {
     switch (frequency) {
-      case 'hourly':
+      case "hourly":
         return NOTIFEE_REPEAT.HOURLY;
-      case 'daily':
+      case "daily":
         return NOTIFEE_REPEAT.DAILY;
-      case 'weekly':
+      case "weekly":
         return NOTIFEE_REPEAT.WEEKLY;
       default:
         return NOTIFEE_REPEAT.DAILY;
@@ -415,9 +449,9 @@ class NotificationManagerClass {
 export const NotificationManager = new NotificationManagerClass();
 
 function formatErrorForDiagnostics(error: unknown): string {
-  if (error && typeof error === 'object') {
+  if (error && typeof error === "object") {
     const anyErr = error as { code?: string; message?: string };
-    if (typeof anyErr.code === 'string' && typeof anyErr.message === 'string') {
+    if (typeof anyErr.code === "string" && typeof anyErr.message === "string") {
       return `${anyErr.code}: ${anyErr.message}`;
     }
   }
@@ -436,7 +470,7 @@ function formatErrorForDiagnostics(error: unknown): string {
  * @see https://notifee.app/react-native/docs/triggers#android-12-limitations
  */
 async function ensureAndroidExactAlarmsAllowedForTriggers(): Promise<void> {
-  if (Platform.OS !== 'android' || Platform.Version < 31) return;
+  if (Platform.OS !== "android" || Platform.Version < 31) return;
 
   const settings = await notifee.getNotificationSettings();
   if (settings.android?.alarm !== AndroidNotificationSetting.ENABLED) {

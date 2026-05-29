@@ -1,5 +1,5 @@
-import { FirebaseAnalyticsProvider } from './providers/firebase/FirebaseAnalyticsProvider';
-import type { IAnalyticsProvider } from './providers/IAnalyticsProvider';
+import { FirebaseAnalyticsProvider } from "./providers/firebase/FirebaseAnalyticsProvider";
+import type { IAnalyticsProvider } from "./providers/IAnalyticsProvider";
 
 /**
  * Returns the production Analytics implementation (Firebase).

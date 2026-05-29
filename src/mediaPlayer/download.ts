@@ -1,5 +1,5 @@
-import ReactNativeBlobUtil from 'react-native-blob-util';
-import type { DownloadProgress } from './types';
+import ReactNativeBlobUtil from "react-native-blob-util";
+import type { DownloadProgress } from "./types";
 
 export type DownloadStreamOptions = Readonly<{
   url: string;
@@ -35,10 +35,10 @@ function validateDownloadUrl(url: string): void {
   try {
     parsed = new URL(url);
   } catch {
-    throw new Error('mediaPlayer download: url must be absolute');
+    throw new Error("mediaPlayer download: url must be absolute");
   }
-  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
-    throw new Error('mediaPlayer download: url must be http or https');
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    throw new Error("mediaPlayer download: url must be http or https");
   }
 }
 
@@ -85,8 +85,8 @@ function parseTotalFromContentRange(
 export async function ensureDirectoryExists(
   directoryPath: string,
 ): Promise<void> {
-  assertNonEmpty(directoryPath, 'directoryPath');
-  const normalized = directoryPath.replace(/\/$/, '');
+  assertNonEmpty(directoryPath, "directoryPath");
+  const normalized = directoryPath.replace(/\/$/, "");
   if (await ReactNativeBlobUtil.fs.exists(normalized)) {
     return;
   }
@@ -94,12 +94,12 @@ export async function ensureDirectoryExists(
 }
 
 export async function mediaFileExists(absolutePath: string): Promise<boolean> {
-  assertNonEmpty(absolutePath, 'absolutePath');
+  assertNonEmpty(absolutePath, "absolutePath");
   return ReactNativeBlobUtil.fs.exists(absolutePath.trim());
 }
 
 export async function deleteMediaFile(absolutePath: string): Promise<void> {
-  assertNonEmpty(absolutePath, 'absolutePath');
+  assertNonEmpty(absolutePath, "absolutePath");
   const p = absolutePath.trim();
   if (await ReactNativeBlobUtil.fs.exists(p)) {
     await ReactNativeBlobUtil.fs.unlink(p);
@@ -136,10 +136,10 @@ export function downloadProgressiveVideoCancellable(
   options: DownloadStreamOptions,
 ): CancellableProgressiveDownload {
   validateDownloadUrl(options.url);
-  assertNonEmpty(options.directoryPath, 'directoryPath');
-  assertNonEmpty(options.fileName, 'fileName');
+  assertNonEmpty(options.directoryPath, "directoryPath");
+  assertNonEmpty(options.fileName, "fileName");
 
-  const dir = options.directoryPath.replace(/\/$/, '');
+  const dir = options.directoryPath.replace(/\/$/, "");
   const destPath = `${dir}/${options.fileName}`;
   const chunkPath = resumeChunkPathForDestination(destPath);
   const unlinkDestOnCancel = options.unlinkDestinationOnCancel !== false;
@@ -150,7 +150,7 @@ export function downloadProgressiveVideoCancellable(
   const promise = (async (): Promise<DownloadStreamResult> => {
     await ensureDirectoryExists(dir);
     if (cancelledBeforeStart) {
-      throw new Error('mediaPlayer download: cancelled');
+      throw new Error("mediaPlayer download: cancelled");
     }
 
     await ReactNativeBlobUtil.fs.unlink(chunkPath).catch(() => {});
@@ -183,7 +183,7 @@ export function downloadProgressiveVideoCancellable(
     const MAX_RESUME_SEGMENTS = 64;
     for (let segment = 0; segment < MAX_RESUME_SEGMENTS; segment += 1) {
       if (cancelledBeforeStart) {
-        throw new Error('mediaPlayer download: cancelled');
+        throw new Error("mediaPlayer download: cancelled");
       }
 
       const destExists = await ReactNativeBlobUtil.fs.exists(destPath);
@@ -211,7 +211,7 @@ export function downloadProgressiveVideoCancellable(
       }
 
       const task = ReactNativeBlobUtil.config({ path: writePath }).fetch(
-        'GET',
+        "GET",
         options.url,
         reqHeaders,
       ) as BlobFetchTask;
@@ -237,7 +237,7 @@ export function downloadProgressiveVideoCancellable(
 
       const info = resp.info();
       const status = info.status;
-      const contentRange = getHeader(info.headers, 'Content-Range');
+      const contentRange = getHeader(info.headers, "Content-Range");
       const parsedTotal = parseTotalFromContentRange(contentRange);
       if (parsedTotal !== null) {
         knownTotal = parsedTotal;
@@ -245,7 +245,7 @@ export function downloadProgressiveVideoCancellable(
 
       if (!isResume) {
         if (status === 200) {
-          const cl = getHeader(info.headers, 'Content-Length');
+          const cl = getHeader(info.headers, "Content-Length");
           if (knownTotal === null && cl) {
             const n = parseInt(cl, 10);
             if (!Number.isNaN(n) && n > 0) {
@@ -261,12 +261,12 @@ export function downloadProgressiveVideoCancellable(
 
       if (status === 206) {
         const sizeBefore = (await ReactNativeBlobUtil.fs.stat(destPath)).size;
-        await ReactNativeBlobUtil.fs.appendFile(destPath, chunkPath, 'uri');
+        await ReactNativeBlobUtil.fs.appendFile(destPath, chunkPath, "uri");
         await ReactNativeBlobUtil.fs.unlink(chunkPath).catch(() => {});
         const sizeAfter = (await ReactNativeBlobUtil.fs.stat(destPath)).size;
         if (sizeAfter <= sizeBefore) {
           throw new Error(
-            'mediaPlayer download: no bytes appended (range unsupported?)',
+            "mediaPlayer download: no bytes appended (range unsupported?)",
           );
         }
         if (knownTotal !== null && knownTotal > 0 && sizeAfter >= knownTotal) {
@@ -296,14 +296,14 @@ export function downloadProgressiveVideoCancellable(
         if (knownTotal !== null && offset >= knownTotal) {
           return { path: destPath };
         }
-        throw new Error('mediaPlayer download: range not satisfiable');
+        throw new Error("mediaPlayer download: range not satisfiable");
       }
 
       await ReactNativeBlobUtil.fs.unlink(chunkPath).catch(() => {});
       throw new Error(`mediaPlayer download: HTTP ${status}`);
     }
 
-    throw new Error('mediaPlayer download: too many resume segments');
+    throw new Error("mediaPlayer download: too many resume segments");
   })();
 
   const cancel = () => {

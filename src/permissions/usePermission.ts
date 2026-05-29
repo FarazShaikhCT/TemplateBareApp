@@ -1,6 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
-import { PermissionsManager } from './PermissionsManager';
-import type { PermissionKey, PermissionResult, PermissionStatus } from './types';
+import { useState, useEffect, useCallback } from "react";
+import { PermissionsManager } from "./PermissionsManager";
+import type {
+  PermissionKey,
+  PermissionResult,
+  PermissionStatus,
+} from "./types";
 
 interface UsePermissionResult {
   status: PermissionStatus | null;
