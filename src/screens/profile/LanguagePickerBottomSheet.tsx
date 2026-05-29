@@ -2,17 +2,17 @@ import {
   BottomSheetBackdrop,
   BottomSheetModal,
   BottomSheetView,
-} from '@gorhom/bottom-sheet';
-import type { BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
-import type { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import React, { forwardRef, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Pressable, Text } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+} from "@gorhom/bottom-sheet";
+import type { BottomSheetBackdropProps } from "@gorhom/bottom-sheet";
+import type { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
+import React, { forwardRef, useCallback } from "react";
+import { useTranslation } from "react-i18next";
+import { Pressable, Text } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useThemedStyles } from "../../theme/useThemedStyles";
 
-export type LanguagePickerOption = 'en' | 'es' | 'device';
+export type LanguagePickerOption = "en" | "es" | "device";
 
 type Props = {
   selectedKey: LanguagePickerOption;
@@ -22,13 +22,13 @@ type Props = {
 const OPTIONS: readonly {
   key: LanguagePickerOption;
   labelKey:
-    | 'settings.languageEnglish'
-    | 'settings.languageSpanish'
-    | 'settings.useDeviceLanguage';
+    | "settings.languageEnglish"
+    | "settings.languageSpanish"
+    | "settings.useDeviceLanguage";
 }[] = [
-  { key: 'en', labelKey: 'settings.languageEnglish' },
-  { key: 'es', labelKey: 'settings.languageSpanish' },
-  { key: 'device', labelKey: 'settings.useDeviceLanguage' },
+  { key: "en", labelKey: "settings.languageEnglish" },
+  { key: "es", labelKey: "settings.languageSpanish" },
+  { key: "device", labelKey: "settings.useDeviceLanguage" },
 ];
 
 export const LanguagePickerBottomSheet = forwardRef<
@@ -53,14 +53,14 @@ export const LanguagePickerBottomSheet = forwardRef<
       },
       title: {
         fontSize: 18,
-        fontWeight: '700',
+        fontWeight: "700",
         color: colors.text1,
         marginBottom: 16,
       },
       row: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
         paddingVertical: 14,
         borderBottomWidth: 1,
         borderBottomColor: colors.grayBackground,
@@ -73,11 +73,11 @@ export const LanguagePickerBottomSheet = forwardRef<
         color: colors.text1,
       },
       rowLabelSelected: {
-        fontWeight: '700',
+        fontWeight: "700",
       },
       checkmark: {
         fontSize: 16,
-        fontWeight: '700',
+        fontWeight: "700",
         color: colors.primary,
       },
     }),
@@ -106,7 +106,7 @@ export const LanguagePickerBottomSheet = forwardRef<
       backdropComponent={renderBackdrop}
     >
       <BottomSheetView style={styles.content}>
-        <Text style={styles.title}>{t('settings.languageSheetTitle')}</Text>
+        <Text style={styles.title}>{t("settings.languageSheetTitle")}</Text>
         {OPTIONS.map((option, index) => {
           const isSelected = selectedKey === option.key;
           const isLast = index === OPTIONS.length - 1;

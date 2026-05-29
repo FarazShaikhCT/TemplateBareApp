@@ -12,7 +12,7 @@ on:
         description: "Xcode scheme used by Fastlane gym"
         type: string
         required: false
-        default: Prod
+        default: TemplateExpoTemplateExpoDev
     secrets:
       APP_STORE_CONNECT_KEY_ID:
         required: true
@@ -69,7 +69,7 @@ jobs:
           path: |
             ios/Pods
             ~/Library/Caches/CocoaPods
-          key: pods-${{ runner.os }}-${{ hashFiles('ios/Podfile.lock') }}
+          key: pods-${{ runner.os }}-${{ hashFiles('ios/Podfile.lock', 'ios/Podfile') }}
       - name: pod install
         run: bundle exec pod install --project-directory=ios
       - name: Install cert + profile
@@ -95,8 +95,8 @@ jobs:
           UUID=$(/usr/libexec/PlistBuddy -c 'Print UUID' "$RUNNER_TEMP/profile.plist")
           PROFILE_NAME=$(/usr/libexec/PlistBuddy -c 'Print Name' "$RUNNER_TEMP/profile.plist")
           TEAM_ID=$(/usr/libexec/PlistBuddy -c 'Print TeamIdentifier:0' "$RUNNER_TEMP/profile.plist")
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          cp "$PROFILE_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/"$UUID.mobileprovision"
+          mkdir -p ~/Library/MobileTemplateExpoDevice/Provisioning\ Profiles
+          cp "$PROFILE_PATH" ~/Library/MobileTemplateExpoDevice/Provisioning\ Profiles/"$UUID.mobileprovision"
           echo "IOS_PROVISIONING_PROFILE_NAME<<EOF" >> $GITHUB_ENV
           echo "$PROFILE_NAME" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
@@ -108,13 +108,13 @@ jobs:
           APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
           APP_IDENTIFIER: ${{ inputs.app_identifier }}
           IOS_SCHEME: ${{ inputs.ios_scheme }}
-          IOS_BUILD_CONFIGURATION: Release-Prod
+          IOS_BUILD_CONFIGURATION: Release-TemplateExpoTemplateExpoDev
           IOS_CODESIGN_IDENTITY: ${{ secrets.IOS_CODESIGN_IDENTITY }}
         run: bundle exec fastlane staging_build
       - uses: actions/upload-artifact@v4
         with:
           name: ios-template-pipeline-react-native-staging-ipa
-          path: build/TemplateBareApp.ipa
+          path: build/TemplateExpoTemplateExpoDev.ipa
           if-no-files-found: warn
       - name: Cleanup keychain
         if: always()

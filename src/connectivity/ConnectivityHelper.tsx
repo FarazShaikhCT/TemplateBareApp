@@ -5,16 +5,16 @@ import React, {
   useEffect,
   useState,
   type ReactNode,
-} from 'react';
-import { View, Text, StatusBar } from 'react-native';
-import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
-import { SafeAreaView } from 'react-native-safe-area-context';
+} from "react";
+import { View, Text, StatusBar } from "react-native";
+import NetInfo, { NetInfoState } from "@react-native-community/netinfo";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { FontSizeToken } from '../designSystem/generated/fontSize';
-import { LineHeightToken } from '../designSystem/generated/lineHeight';
-import { SpacingToken } from '../designSystem/generated/spacing';
-import { useAppTheme } from '../theme/ThemeContext';
-import { useThemedStyles } from '../theme/useThemedStyles';
+import { FontSizeToken } from "../designSystem/generated/fontSize";
+import { LineHeightToken } from "../designSystem/generated/lineHeight";
+import { SpacingToken } from "../designSystem/generated/spacing";
+import { useAppTheme } from "../theme/ThemeContext";
+import { useThemedStyles } from "../theme/useThemedStyles";
 
 // 1. Define the Context Shape
 interface ConnectivityContextType {
@@ -38,12 +38,12 @@ const ConnectivityOfflineView = React.memo(function ConnectivityOfflineView() {
       errorContainer: {
         flex: 1,
         backgroundColor: c.background,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
       },
       content: {
         paddingHorizontal: SpacingToken.spacing_value_10,
-        alignItems: 'center',
+        alignItems: "center",
       },
       icon: {
         fontSize: FontSizeToken.display_md,
@@ -51,22 +51,22 @@ const ConnectivityOfflineView = React.memo(function ConnectivityOfflineView() {
       },
       title: {
         fontSize: FontSizeToken.heading_md,
-        fontWeight: '700',
-        textAlign: 'center',
+        fontWeight: "700",
+        textAlign: "center",
         marginBottom: SpacingToken.spacing_value_3,
         color: c.text1,
       },
       message: {
         fontSize: FontSizeToken.body_md,
         lineHeight: LineHeightToken.body_md,
-        textAlign: 'center',
+        textAlign: "center",
         color: c.text2,
       },
     }),
     [],
   );
 
-  const statusBarStyle = theme === 'dark' ? 'light-content' : 'dark-content';
+  const statusBarStyle = theme === "dark" ? "light-content" : "dark-content";
 
   return (
     <SafeAreaView style={styles.errorContainer}>

@@ -8,9 +8,9 @@ description: >-
   shell-first: optional one-message skill-first rsync, then rsync
   .github/.semgrep/.cursor, Gemfile/Fastfile when missing or with explicit
   overwrite, merge .gitignore, align package.json CI scripts, bootstrap
-  workflow IDs, secrets checklist, optional Expo native-dir assert. Use for
-  one-shot pipeline reuse, CURSOR_RN_DEVOPS_ONE_SHOT, or copying RN CI from the
-  template.
+  workflow IDs, Android perf FPS scroll setup (deep link), secrets checklist,
+  optional Expo native-dir assert. Use for one-shot pipeline reuse,
+  CURSOR_RN_DEVOPS_ONE_SHOT, or copying RN CI from the template.
 ---
 
 # RN DevOps kit — apply into this repo
@@ -23,7 +23,7 @@ Phased playbook for the **target** app (workspace root has `package.json`). Full
 
 ## Single session (one user message)
 
-Use when the user wants **no second chat**: copy this skill (and Cursor rules) from `TEMPLATE_ROOT` onto disk first, optionally load this file into context, then continue **Phase 1** through **Phase 8** in the **same** agent turn.
+Use when the user wants **no second chat**: copy this skill (and Cursor rules) from `TEMPLATE_ROOT` onto disk first, optionally load this file into context, then continue **Phase 1** through **Phase 8** (including **Phase 5.5**) in the **same** agent turn.
 
 **Phase 0 — Skill and rules on disk** (from target repo root, `TEMPLATE_ROOT` set):
 
@@ -36,6 +36,8 @@ rsync -a "${TEMPLATE_ROOT}/.cursor/rules/" "./.cursor/rules/"
 **Optional (recommended):** `read_file` **`./.cursor/skills/rn-devops-apply-kit/SKILL.md`** once so the phase list is in context. Do **not** bulk-read `.github/workflows/`.
 
 **Then:** run **Phase 1** onward. **Phase 2** must still run the full **`rsync "${TEMPLATE_ROOT}/.cursor/" "./.cursor/"`** (and `.github/`, `.semgrep/`) per [`SETUP_RN_DEVOPS_KIT.md`](../../../SETUP_RN_DEVOPS_KIT.md) — it is idempotent and keeps the whole `.cursor/` tree aligned with the template.
+
+**Phase 5.5 is mandatory** when `rn.yml` contains **`android-perf`**: use **AskQuestion** (see below) so the user configures FPS on a scrollable screen before handoff.
 
 ---
 
@@ -63,7 +65,7 @@ Agent preflight: `test -d "${TEMPLATE_ROOT}/.github" && test -f "${TEMPLATE_ROOT
 
 ---
 
-## Optional AskQuestion (overwrite)
+## AskQuestion — Gemfile / Fastfile overwrite
 
 Run **only if** any of these exist: `./Gemfile`, `./Gemfile.lock`, `./fastlane/Fastfile`. If **none** exist, skip the question and use missing-only copies.
 
@@ -71,6 +73,41 @@ Run **only if** any of these exist: `./Gemfile`, `./Gemfile.lock`, `./fastlane/F
 
 - **Default (recommended):** No — copy `Gemfile`/`Gemfile.lock` only when at least one is missing (`if [ ! -f ./Gemfile ] || [ ! -f ./Gemfile.lock ]; then cp ...`); copy `Fastfile` only when `./fastlane/Fastfile` is missing.
 - **Yes:** `cp "${TEMPLATE_ROOT}/Gemfile" "${TEMPLATE_ROOT}/Gemfile.lock" ./` and `mkdir -p fastlane && cp "${TEMPLATE_ROOT}/fastlane/Fastfile" ./fastlane/` unconditionally.
+
+---
+
+## AskQuestion — Android perf FPS scroll (mandatory after Phase 5)
+
+Run when **`.github/workflows/rn.yml`** contains an **`android-perf`** job (always true after kit sync). **Do not skip** unless the user already supplied a deep link and settle time in the same message.
+
+**Prompt 1 — FPS measurement target**
+
+| Option | Meaning |
+| --- | --- |
+| **Scrollable screen via deep link** | User will provide (or already provided) a URL such as `myapp://posts`; agent runs `configure_android_perf_fps.py` and reminds them to add linking + intent filter per [`docs/ANDROID_PERF_FPS_SETUP.md`](../../../docs/ANDROID_PERF_FPS_SETUP.md). |
+| **Launcher / home only** | No deep link; run `configure_android_perf_fps.py --clear`. FPS is measured on whatever screen is open after cold launch (often less representative). |
+| **Disable android-perf for now** | Comment out or remove the `android-perf` job in `rn.yml`; tell user they can re-enable after app setup. |
+
+**Prompt 2** (only if **Scrollable screen via deep link**): ask in chat for:
+
+1. **Deep link URL** — must match React Navigation `linking` and Android intent filter.
+2. **`perf_settle_seconds`** — default **12** if omitted (network + list render wait).
+
+Then from target repo root:
+
+```bash
+python3 .github/scripts/configure_android_perf_fps.py \
+  --deep-link "<url-from-user>" \
+  --settle-seconds <seconds>
+```
+
+**If the scroll screen needs remote data** (e.g. `react-native-config` / `API_BASE_URL`):
+
+- Ensure **`.github/env.dev.ci`** exists (copied with the kit) or create it with safe dev API values.
+- Confirm **`android-dev`** runs `ensure_react_native_config_env.sh` (in `rn-job-android-firebase-release-bare.yml` after sync).
+- Remind: commit **intent filter** + **linking** in the app; secrets checklist for Firebase if the app uses `@react-native-firebase`.
+
+**Handoff bullet** (always include when `android-perf` is enabled): link [`docs/ANDROID_PERF_FPS_SETUP.md`](../../../docs/ANDROID_PERF_FPS_SETUP.md) and note whether deep link was configured or cleared.
 
 ---
 
@@ -155,6 +192,17 @@ Append any user-provided flags on both commands if detection is wrong. If there 
 
 **Note:** Bundle IDs are read from **`ios/xcconfig/`** (CT parity) then **`project.pbxproj`**, not from `app.config.ts` alone. CI expects **Dev** + **Debug-Dev** (dev) and **Prod** + **Release-Prod** (dist); prod bundle ID is the **base** id (no `.dist`). See **`docs/CI_FLAVOR_CONTRACT.md`**.
 
+**Android performance (`android-perf` in `rn.yml`):** The template ships sample **`package`** (dev `applicationId`) and **`activity`** (`{applicationId}/{namespace}.MainActivity`) for this repo’s app. Bootstrap reads **`android/app/build.gradle`** and rewrites those two fields — do not hand-edit after apply unless detection failed. If bootstrap warns about a missing namespace, set them manually to match the dev APK you build in **`android-dev`**.
+
+---
+
+## Phase 5.5 — Android perf FPS scroll setup
+
+1. Confirm **`android-perf`** exists in **`.github/workflows/rn.yml`** (if not, skip this phase).
+2. Run **AskQuestion — Android perf FPS scroll** (above). Collect deep link URL and settle seconds when applicable.
+3. Run **`configure_android_perf_fps.py`** with `--deep-link` / `--settle-seconds` or `--clear`.
+4. If the user chose scrollable screen but has not implemented linking yet, list app tasks from **`docs/ANDROID_PERF_FPS_SETUP.md`** (intent filter, `FlatList`, env file) in the Phase 8 handoff — CI will not measure meaningful FPS until those exist.
+
 ---
 
 ## Phase 6 — Secrets checklist
@@ -183,3 +231,4 @@ fi
 
 - If **`TARGET_REMOTE_URL`** was provided: commit with a clear message, set `origin` / push current branch per **`.cursor/rules/git-rn-bootstrap.mdc`** and **`.cursor/rules/rn-devops-agent-playbook.mdc`**. Do not push unless the user supplied the URL and expects it.
 - **Handoff:** List manual follow-ups separately: Firebase, keystores, App Store Connect API key, Play service account, **`EXPO_TOKEN`** only if optional EAS workflows are used. Keep signing separate from Git remote setup.
+- **Android perf FPS:** Summarize Phase 5.5 outcome (deep link configured, cleared, or job disabled) and point to [`docs/ANDROID_PERF_FPS_SETUP.md`](../../../docs/ANDROID_PERF_FPS_SETUP.md) for any remaining app-side work.

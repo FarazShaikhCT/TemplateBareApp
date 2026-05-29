@@ -133,10 +133,10 @@ export function FeedbackCatalogScreen() {
         type === 'success'
           ? 'Success'
           : type === 'error'
-          ? 'Error'
-          : type === 'warning'
-          ? 'Warning'
-          : 'Info',
+            ? 'Error'
+            : type === 'warning'
+              ? 'Warning'
+              : 'Info',
       message: `Toast with ${type} type and action button`,
       type,
       duration: 5000,
@@ -198,10 +198,10 @@ export function FeedbackCatalogScreen() {
         type === 'success'
           ? 'Success!'
           : type === 'error'
-          ? 'Error'
-          : type === 'warning'
-          ? 'Warning'
-          : 'Information',
+            ? 'Error'
+            : type === 'warning'
+              ? 'Warning'
+              : 'Information',
       message: `This is a single button alert with ${type} type. Tap OK to dismiss.`,
       type,
       buttons: [{ text: 'OK', style: 'default' }],

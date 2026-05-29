@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -6,8 +6,8 @@ import {
   Animated,
   ActivityIndicator,
   Modal,
-} from 'react-native';
-import type { LoadingConfig } from './types';
+} from "react-native";
+import type { LoadingConfig } from "./types";
 
 interface LoadingOverlayProps {
   config: LoadingConfig | null;
@@ -37,22 +37,23 @@ export function LoadingOverlay({ config }: LoadingOverlayProps) {
     return null;
   }
 
-  const size = config.size === 'small' ? 24 : config.size === 'large' ? 48 : 36;
+  const size =
+    config.size === "small" ? 24 : config.size === "large" ? 48 : 36;
 
   const renderLoadingIndicator = () => {
     switch (config.variant) {
-      case 'spinner':
+      case "spinner":
       default:
         return (
           <ActivityIndicator
-            size={config.size === 'small' ? 'small' : 'large'}
-            color={config.color || '#FFFFFF'}
+            size={config.size === "small" ? "small" : "large"}
+            color={config.color || "#FFFFFF"}
           />
         );
-      case 'dots':
-        return <DotsLoader size={size} color={config.color || '#FFFFFF'} />;
-      case 'pulse':
-        return <PulseLoader size={size} color={config.color || '#FFFFFF'} />;
+      case "dots":
+        return <DotsLoader size={size} color={config.color || "#FFFFFF"} />;
+      case "pulse":
+        return <PulseLoader size={size} color={config.color || "#FFFFFF"} />;
     }
   };
 
@@ -62,7 +63,7 @@ export function LoadingOverlay({ config }: LoadingOverlayProps) {
         style={[
           styles.overlay,
           {
-            backgroundColor: config.backgroundColor || 'rgba(0, 0, 0, 0.7)',
+            backgroundColor: config.backgroundColor || "rgba(0, 0, 0, 0.7)",
             opacity: fadeAnim,
           },
         ]}
@@ -70,9 +71,7 @@ export function LoadingOverlay({ config }: LoadingOverlayProps) {
         <View style={styles.content}>
           {renderLoadingIndicator()}
           {config.message ? (
-            <Text
-              style={[styles.message, { color: config.color || '#FFFFFF' }]}
-            >
+            <Text style={[styles.message, { color: config.color || "#FFFFFF" }]}>
               {config.message}
             </Text>
           ) : null}
@@ -216,22 +215,22 @@ function PulseLoader({ size, color }: { size: number; color: string }) {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   content: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   message: {
     marginTop: 16,
     fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: "600",
+    textAlign: "center",
   },
   dotsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   dot: {

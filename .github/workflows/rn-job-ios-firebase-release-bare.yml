@@ -28,17 +28,17 @@ on:
         description: "Xcode scheme used by Fastlane gym"
         type: string
         required: false
-        default: Prod
+        default: TemplateExpoTemplateExpoDev
       ios_build_configuration_dev:
-        description: "Xcode build configuration for dev Firebase builds (CT flavor default Debug-Dev)"
+        description: "Xcode build configuration for dev Firebase builds (CT flavor default Debug-TemplateExpoDev)"
         type: string
         required: false
-        default: Debug-Dev
+        default: Debug-TemplateExpoDev
       ios_build_configuration_dist:
-        description: "Xcode build configuration for dist Firebase builds (CT flavor default Release-Prod)"
+        description: "Xcode build configuration for dist Firebase builds (CT flavor default Release-TemplateExpoTemplateExpoDev)"
         type: string
         required: false
-        default: Release-Prod
+        default: Release-TemplateExpoTemplateExpoDev
       firebase_groups:
         description: Comma-separated Firebase App Distribution tester groups
         type: string
@@ -48,6 +48,21 @@ on:
         required: false
         type: string
         default: ""
+      ios_workspace:
+        description: "Path to the .xcworkspace (relative to repo root)"
+        type: string
+        required: false
+        default: ios/TemplateExpoTemplateExpoDev.xcworkspace
+      produce_test_products:
+        description: >
+          After the main Fastlane build, also run xcodebuild build-for-testing for the
+          iphonesimulator SDK and upload the test products as an artifact named
+          ios-test-products-<run_number>. The iOS performance job can download this
+          artifact to skip its own build-for-testing phase, saving 5–10 min of cloud compute.
+          Only meaningful when firebase_ios_app == 'dev' (simulator target uses Debug-TemplateExpoDev).
+        type: boolean
+        required: false
+        default: false
     secrets:
       # Dist (release bundle ID)
       DIST_CERTIFICATE_BASE64:
@@ -56,7 +71,7 @@ on:
         required: true
       DIST_PROFILE_BASE64:
         required: true
-      # Dev bundle ID (when inputs.firebase_ios_app == dev)
+      # TemplateExpoDev bundle ID (when inputs.firebase_ios_app == dev)
       DIST_CERTIFICATE_DEV_BASE64:
         required: false
       DIST_CERTIFICATE_DEV_PASSWORD:
@@ -117,7 +132,9 @@ jobs:
           path: |
             ios/Pods
             ~/Library/Caches/CocoaPods
-          key: pods-${{ runner.os }}-${{ hashFiles('ios/Podfile.lock') }}
+          key: pods-${{ runner.os }}-${{ hashFiles('ios/Podfile.lock', 'ios/Podfile') }}
+          restore-keys: |
+            pods-${{ runner.os }}-
       - name: pod install
         run: bundle exec pod install --project-directory=ios
       - name: Install cert + profile
@@ -133,7 +150,7 @@ jobs:
           set -euo pipefail
           if [ "$FIREBASE_IOS_APP" = "dev" ]; then
             if [ -z "${DIST_CERTIFICATE_DEV_BASE64:-}" ] || [ -z "${DIST_CERTIFICATE_DEV_PASSWORD:-}" ] || [ -z "${DIST_PROFILE_DEV_BASE64:-}" ]; then
-              echo "::error::Dev iOS signing requires repository secrets: DIST_CERTIFICATE_DEV_BASE64, DIST_CERTIFICATE_DEV_PASSWORD, DIST_PROFILE_DEV_BASE64"
+              echo "::error::TemplateExpoDev iOS signing requires repository secrets: DIST_CERTIFICATE_DEV_BASE64, DIST_CERTIFICATE_DEV_PASSWORD, DIST_PROFILE_DEV_BASE64"
               exit 1
             fi
             DIST_CERTIFICATE_BASE64="$DIST_CERTIFICATE_DEV_BASE64"
@@ -160,11 +177,11 @@ jobs:
           PROFILE_BUNDLE="${APP_ID_FULL#${TEAM_ID}.}"
           EXPECTED_BUNDLE="${APP_IDENTIFIER:-}"
           if [ -n "$EXPECTED_BUNDLE" ] && [ "$PROFILE_BUNDLE" != "$EXPECTED_BUNDLE" ]; then
-            echo "::error::Provisioning profile App ID \"${PROFILE_BUNDLE}\" does not match APP_IDENTIFIER \"${EXPECTED_BUNDLE}\". Regenerate DIST_PROFILE_BASE64 (or dev profile) for the correct bundle ID in Apple Developer."
+            echo "::error::Provisioning profile App ID \"${PROFILE_BUNDLE}\" does not match APP_IDENTIFIER \"${EXPECTED_BUNDLE}\". Regenerate DIST_PROFILE_BASE64 (or dev profile) for the correct bundle ID in Apple TemplateExpoDeveloper."
             exit 1
           fi
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          cp "$PROFILE_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/"$UUID.mobileprovision"
+          mkdir -p ~/Library/MobileTemplateExpoDevice/Provisioning\ Profiles
+          cp "$PROFILE_PATH" ~/Library/MobileTemplateExpoDevice/Provisioning\ Profiles/"$UUID.mobileprovision"
           echo "IOS_PROVISIONING_PROFILE_NAME<<EOF" >> $GITHUB_ENV
           echo "$PROFILE_NAME" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
@@ -175,9 +192,50 @@ jobs:
           IOS_SCHEME: ${{ inputs.ios_scheme }}
           IOS_CODESIGN_IDENTITY: ${{ secrets.IOS_CODESIGN_IDENTITY }}
           IOS_BUILD_CONFIGURATION: ${{ inputs.firebase_ios_app == 'dev' && inputs.ios_build_configuration_dev || inputs.ios_build_configuration_dist }}
-          # Dev Firebase: Ad Hoc profile + ad-hoc export. Dist: App Store profile + app-store export.
+          # TemplateExpoDev Firebase: Ad Hoc profile + ad-hoc export. Dist: App Store profile + app-store export.
           IOS_EXPORT_METHOD: ${{ inputs.firebase_ios_app == 'dev' && 'development' || 'app-store' }}
         run: bundle exec fastlane staging_build
+      # ── Optional: build-for-testing (simulator test products) ──────────────────
+      # Runs only when produce_test_products=true. TemplateExpoTemplateExpoDevuces the DerivedData test
+      # products needed by the iOS performance job so it can skip its own build phase.
+      # Uses the same workspace/scheme already set up by Fastlane above.
+      # continue-on-error so a test-build failure never blocks the IPA upload.
+      - name: Build for testing (simulator test products)
+        id: build_for_testing
+        if: ${{ inputs.produce_test_products == true }}
+        continue-on-error: true
+        env:
+          IOS_WORKSPACE: ${{ inputs.ios_workspace }}
+          IOS_SCHEME: ${{ inputs.ios_scheme }}
+          IOS_BUILD_CONFIGURATION: ${{ inputs.firebase_ios_app == 'dev' && inputs.ios_build_configuration_dev || inputs.ios_build_configuration_dist }}
+          DD: ${{ github.workspace }}/DerivedDataCI
+        run: |
+          set -euo pipefail
+          DEST=$(python3 .github/scripts/ios_first_iphone_sim_udid.py)
+          echo "Building for simulator testing: scheme=$IOS_SCHEME config=$IOS_BUILD_CONFIGURATION dest=$DEST"
+          xcodebuild build-for-testing \
+            -workspace "$IOS_WORKSPACE" \
+            -scheme "$IOS_SCHEME" \
+            -configuration "$IOS_BUILD_CONFIGURATION" \
+            -sdk iphonesimulator \
+            -destination "$DEST" \
+            -derivedDataPath "$DD" \
+            CODE_SIGN_IDENTITY=- \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=YES \
+            FORCE_BUNDLING=1 \
+            2>&1 | tee build/xcodebuild-for-testing.log
+          echo "build_for_testing completed successfully"
+
+      - name: Upload test products artifact
+        if: ${{ inputs.produce_test_products == true && steps.build_for_testing.outcome == 'success' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-test-products-${{ github.run_number }}
+          path: DerivedDataCI/Build/TemplateExpoTemplateExpoDevucts
+          if-no-files-found: warn
+          retention-days: 1
+
       # Docker-based Firebase actions do not run on macOS runners; use Firebase CLI.
       - name: Upload IPA to Firebase App Distribution
         id: upload_firebase
@@ -192,7 +250,7 @@ jobs:
           printf '%s' "$SERVICE_ACCOUNT_JSON" > "$RUNNER_TEMP/firebase-sa.json"
           chmod 600 "$RUNNER_TEMP/firebase-sa.json"
           export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/firebase-sa.json"
-          CMD=(npx --yes firebase-tools@13 appdistribution:distribute "build/TemplateBareApp.ipa" --app "$FIREBASE_APP_ID" --groups "$GROUPS")
+          CMD=(npx --yes firebase-tools@13 appdistribution:distribute "build/TemplateExpoTemplateExpoDev.ipa" --app "$FIREBASE_APP_ID" --groups "$GROUPS")
           if [ -n "${RELEASE_NOTES:-}" ]; then
             CMD+=(--release-notes "$RELEASE_NOTES")
           fi
@@ -200,7 +258,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: ios-firebase-${{ inputs.firebase_ios_app }}-${{ github.run_number }}
-          path: build/TemplateBareApp.ipa
+          path: build/TemplateExpoTemplateExpoDev.ipa
           if-no-files-found: warn
       - name: Notify Slack (workflow webhook)
         if: ${{ inputs.dry_run == false && inputs.upload_to_firebase && steps.upload_firebase.outcome == 'success' }}

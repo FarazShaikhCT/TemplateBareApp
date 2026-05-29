@@ -2,16 +2,16 @@ import {
   BottomSheetBackdrop,
   BottomSheetModal,
   BottomSheetView,
-} from '@gorhom/bottom-sheet';
-import type { BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
-import type { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import React, { forwardRef, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Pressable, Text } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+} from "@gorhom/bottom-sheet";
+import type { BottomSheetBackdropProps } from "@gorhom/bottom-sheet";
+import type { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
+import React, { forwardRef, useCallback } from "react";
+import { useTranslation } from "react-i18next";
+import { Pressable, Text } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import type { ThemePreference } from '../../theme/ThemeContextType';
-import { useThemedStyles } from '../../theme/useThemedStyles';
+import type { ThemePreference } from "../../theme/ThemeContextType";
+import { useThemedStyles } from "../../theme/useThemedStyles";
 
 export type ThemePickerOption = ThemePreference;
 
@@ -23,13 +23,13 @@ type Props = {
 const OPTIONS: readonly {
   key: ThemePickerOption;
   labelKey:
-    | 'settings.themeSystem'
-    | 'settings.themeLight'
-    | 'settings.themeDark';
+    | "settings.themeSystem"
+    | "settings.themeLight"
+    | "settings.themeDark";
 }[] = [
-  { key: 'system', labelKey: 'settings.themeSystem' },
-  { key: 'light', labelKey: 'settings.themeLight' },
-  { key: 'dark', labelKey: 'settings.themeDark' },
+  { key: "system", labelKey: "settings.themeSystem" },
+  { key: "light", labelKey: "settings.themeLight" },
+  { key: "dark", labelKey: "settings.themeDark" },
 ];
 
 export const ThemePickerBottomSheet = forwardRef<
@@ -54,14 +54,14 @@ export const ThemePickerBottomSheet = forwardRef<
       },
       title: {
         fontSize: 18,
-        fontWeight: '700',
+        fontWeight: "700",
         color: colors.text1,
         marginBottom: 16,
       },
       row: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
         paddingVertical: 14,
         borderBottomWidth: 1,
         borderBottomColor: colors.grayBackground,
@@ -74,11 +74,11 @@ export const ThemePickerBottomSheet = forwardRef<
         color: colors.text1,
       },
       rowLabelSelected: {
-        fontWeight: '700',
+        fontWeight: "700",
       },
       checkmark: {
         fontSize: 16,
-        fontWeight: '700',
+        fontWeight: "700",
         color: colors.primary,
       },
     }),
@@ -107,7 +107,7 @@ export const ThemePickerBottomSheet = forwardRef<
       backdropComponent={renderBackdrop}
     >
       <BottomSheetView style={styles.content}>
-        <Text style={styles.title}>{t('settings.themeSheetTitle')}</Text>
+        <Text style={styles.title}>{t("settings.themeSheetTitle")}</Text>
         {OPTIONS.map((option, index) => {
           const isSelected = selectedKey === option.key;
           const isLast = index === OPTIONS.length - 1;

@@ -96,8 +96,8 @@ jobs:
     with:
       branch: ${{ inputs.branch }}
       firebase_android_app: dev
-      gradle_task: assembleDevRelease
-      artifact_glob: app/build/outputs/apk/dev/release/*.apk
+      gradle_task: assembleTemplateExpoDevRelease
+      artifact_glob: app/build/outputs/apk/release/*.apk
       release_notes: ${{ inputs.release_notes }}
       dry_run: ${{ inputs.dry_run }}
       firebase_groups: ${{ inputs.firebase_groups }}
@@ -113,7 +113,7 @@ jobs:
       branch: ${{ inputs.branch }}
       firebase_ios_app: dist
       app_identifier: com.codeandtheory.templatepipelinetest
-      ios_scheme: Prod
+      ios_scheme: TemplateExpoTemplateExpoDev
       dry_run: ${{ inputs.dry_run }}
       firebase_groups: ${{ inputs.firebase_groups }}
       release_notes: ${{ inputs.release_notes }}
@@ -129,7 +129,7 @@ jobs:
       branch: ${{ inputs.branch }}
       firebase_ios_app: dev
       app_identifier: com.codeandtheory.templatepipelinetest.dev
-      ios_scheme: Dev
+      ios_scheme: TemplateExpoDev
       dry_run: ${{ inputs.dry_run }}
       firebase_groups: ${{ inputs.firebase_groups }}
       release_notes: ${{ inputs.release_notes }}

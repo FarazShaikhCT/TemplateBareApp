@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">TemplateBareApp</string>
+  <string name="app_name">TemplateExpo Dev</string>
+  <string name="expo_splash_screen_resize_mode" translatable="false">contain</string>
 </resources>

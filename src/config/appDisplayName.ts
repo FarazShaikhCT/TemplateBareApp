@@ -1,5 +1,6 @@
 /**
- * User-visible app name in chrome (e.g. top bar). Replaced when scaffolding: TemplateBareApp → MyApp.
- * Keep aligned with `app.json` `displayName` / native display name.
+ * User-visible app name in chrome (e.g. top bar). Use the same placeholder as the bare template:
+ * the CLI replaces `TemplateExpo` with the project name for both Expo and bare — not `ExpoTemplate`
+ * (that is only the template folder name in this repo). Keep aligned with `app.config.ts` flavor names if you customize.
  */
-export const APP_DISPLAY_NAME = 'TemplateBareApp';
+export const APP_DISPLAY_NAME = "TemplateExpo";

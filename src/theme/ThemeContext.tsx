@@ -1,6 +1,6 @@
-import type { Theme } from '@react-navigation/native';
-import { DarkTheme, DefaultTheme } from '@react-navigation/native';
-import { localStorageImpl } from '../third-party/localstorage/LocalStorageImpl';
+import type { Theme } from "@react-navigation/native";
+import { DarkTheme, DefaultTheme } from "@react-navigation/native";
+import { localStorageImpl } from "../third-party/localstorage/LocalStorageImpl";
 import React, {
   createContext,
   FC,
@@ -11,28 +11,28 @@ import React, {
   useEffect,
   useMemo,
   useState,
-} from 'react';
-import { useColorScheme } from 'react-native';
-import { DarkColors, LightColors, type AppColors } from './AppColors';
+} from "react";
+import { useColorScheme } from "react-native";
+import { DarkColors, LightColors, type AppColors } from "./AppColors";
 import {
   ThemeContextType,
   ThemePreference,
   ThemeType,
-} from './ThemeContextType';
+} from "./ThemeContextType";
 
 function createAppNavigationTheme(
   appTheme: ThemeType,
   appColors: AppColors,
 ): Theme {
-  const base = appTheme === 'dark' ? DarkTheme : DefaultTheme;
+  const base = appTheme === "dark" ? DarkTheme : DefaultTheme;
   return {
     ...base,
-    dark: appTheme === 'dark',
+    dark: appTheme === "dark",
     colors: {
       ...base.colors,
       primary: appColors.primary,
       background: appColors.background,
-      card: appTheme === 'dark' ? appColors.background : appColors.white,
+      card: appTheme === "dark" ? appColors.background : appColors.white,
       text: appColors.text1,
       border: appColors.grayBackground,
       notification: appColors.error,
@@ -42,26 +42,34 @@ function createAppNavigationTheme(
 
 /** Maps React Native color scheme to resolved theme; null/unknown → light. */
 function colorSchemeToResolved(scheme: string | null | undefined): ThemeType {
-  return scheme === 'dark' ? 'dark' : 'light';
+  return scheme === "dark" ? "dark" : "light";
 }
 
 function resolveTheme(
   preference: ThemePreference,
   colorScheme: string | null | undefined,
 ): ThemeType {
-  if (preference === 'system') {
+  if (preference === "system") {
     return colorSchemeToResolved(colorScheme);
   }
   return preference;
 }
 
 function readThemePreferenceFromStorage(): ThemePreference {
-  const raw = localStorageImpl.getStringValue('app.theme');
-  if (raw === 'system' || raw === 'light' || raw === 'dark') {
+  const raw = localStorageImpl.getStringValue("app.theme");
+  if (raw === "system" || raw === "light" || raw === "dark") {
     return raw;
   }
-  return 'system';
+  return "system";
 }
+
+const defaultThemeContextType: ThemeContextType = {
+  theme: "light",
+  themePreference: "light",
+  colors: LightColors,
+  setTheme: () => {},
+  navigationTheme: createAppNavigationTheme("light", LightColors),
+};
 
 const AppThemeContext = createContext<ThemeContextType | null>(null);
 
@@ -79,7 +87,7 @@ export const AppThemeProvider: FC<PropsWithChildren> = ({
     [themePreference, colorScheme],
   );
 
-  const colors = theme === 'light' ? LightColors : DarkColors;
+  const colors = theme === "light" ? LightColors : DarkColors;
 
   const navigationTheme = useMemo(
     () => createAppNavigationTheme(theme, colors),
@@ -87,7 +95,7 @@ export const AppThemeProvider: FC<PropsWithChildren> = ({
   );
 
   useEffect(() => {
-    localStorageImpl.setValue('app.theme', themePreference);
+    localStorageImpl.setValue("app.theme", themePreference);
   }, [themePreference]);
 
   const setTheme = useCallback((next: ThemePreference) => {
@@ -112,7 +120,7 @@ export const AppThemeProvider: FC<PropsWithChildren> = ({
 export const useAppTheme = (): ThemeContextType => {
   const context = useContext(AppThemeContext);
   if (context == null) {
-    throw new Error('useAppTheme must be used within AppThemeProvider');
+    throw new Error("useAppTheme must be used within AppThemeProvider");
   }
   return context;
 };

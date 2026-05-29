@@ -1,10 +1,10 @@
-type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+type LogLevel = "debug" | "info" | "warn" | "error";
 
 const PREFIX: Record<LogLevel, string> = {
-  debug: '[DEBUG]',
-  info: '[INFO]',
-  warn: '[WARN]',
-  error: '[ERROR]',
+  debug: "[DEBUG]",
+  info: "[INFO]",
+  warn: "[WARN]",
+  error: "[ERROR]",
 };
 
 /**

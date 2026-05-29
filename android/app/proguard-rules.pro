@@ -7,36 +7,8 @@
 # For more details, see
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
-# React Native
--keep class com.facebook.react.** { *; }
--keep class com.facebook.hermes.** { *; }
--keep class com.facebook.jni.** { *; }
--keepclassmembers class * {
-    @com.facebook.react.bridge.ReactMethod *;
-}
+# react-native-reanimated
+-keep class com.swmansion.reanimated.** { *; }
+-keep class com.facebook.react.turbomodule.** { *; }
 
-# Hermes
--keep class com.facebook.hermes.unicode.** { *; }
--keep class com.facebook.jni.** { *; }
-
-# react-native-config
--keep class com.lugg.reactnativeconfig.** { *; }
--keep class **.BuildConfig { *; }
-
-# Keep JavaScript interface methods called from native code
--keepclassmembers class * extends com.facebook.react.bridge.JavaScriptModule { *; }
--keepclassmembers class * extends com.facebook.react.bridge.NativeModule { *; }
-
-# OkHttp (used by React Native networking)
--dontwarn okhttp3.**
--dontwarn okio.**
--keep class okhttp3.** { *; }
--keep interface okhttp3.** { *; }
-
-# Kotlin
--keep class kotlin.** { *; }
--keep class kotlin.Metadata { *; }
--dontwarn kotlin.**
--keepclassmembers class **$WhenMappings {
-    <fields>;
-}
+# Add any project specific keep options here:

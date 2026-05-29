@@ -1,8 +1,8 @@
-import { useMemo, type DependencyList } from 'react';
-import { StyleSheet } from 'react-native';
+import { useMemo, type DependencyList } from "react";
+import { StyleSheet } from "react-native";
 
-import type { AppColors } from './AppColors';
-import { useAppTheme } from './ThemeContext';
+import type { AppColors } from "./AppColors";
+import { useAppTheme } from "./ThemeContext";
 
 /**
  * Builds a StyleSheet from the current theme colors. Recreates when `colors`

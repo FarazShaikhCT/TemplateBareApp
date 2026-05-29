@@ -1,6 +1,6 @@
-export type LoadingSize = 'small' | 'medium' | 'large';
+export type LoadingSize = "small" | "medium" | "large";
 
-export type LoadingVariant = 'spinner' | 'dots' | 'pulse';
+export type LoadingVariant = "spinner" | "dots" | "pulse";
 
 export interface LoadingConfig {
   message?: string;

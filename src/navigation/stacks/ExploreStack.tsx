@@ -1,10 +1,10 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import React from "react";
+import { useTranslation } from "react-i18next";
 
-import { ExploreDetailScreen } from '../../screens/explore/ExploreDetailScreen';
-import { ExploreScreen } from '../../screens/explore/ExploreScreen';
-import type { ExploreStackParamList } from '../types';
+import { ExploreDetailScreen } from "../../screens/explore/ExploreDetailScreen";
+import { ExploreScreen } from "../../screens/explore/ExploreScreen";
+import type { ExploreStackParamList } from "../types";
 
 const Stack = createNativeStackNavigator<ExploreStackParamList>();
 
@@ -17,7 +17,7 @@ export function ExploreStack() {
       <Stack.Screen
         name="ExploreDetail"
         component={ExploreDetailScreen}
-        options={{ headerShown: true, title: t('stacks.exploreDetailTitle') }}
+        options={{ headerShown: true, title: t("stacks.exploreDetailTitle") }}
       />
     </Stack.Navigator>
   );

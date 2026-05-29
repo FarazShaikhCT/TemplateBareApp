@@ -7,11 +7,7 @@ import {
   Permission,
 } from 'react-native-permissions';
 import { Platform } from 'react-native';
-import type {
-  PermissionKey,
-  PermissionResult,
-  PermissionStatus,
-} from './types';
+import type { PermissionKey, PermissionResult, PermissionStatus } from './types';
 
 /**
  * Maps a PermissionKey to the platform-specific react-native-permissions constant.

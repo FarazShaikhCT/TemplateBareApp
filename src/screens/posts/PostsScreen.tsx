@@ -1,17 +1,17 @@
-import { DrawerActions } from '@react-navigation/native';
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { FlatList, StyleSheet, Text, View, Pressable } from 'react-native';
+import { DrawerActions } from "@react-navigation/native";
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { FlatList, StyleSheet, Text, View, Pressable } from "react-native";
 
-import type { Post } from '../../api/types/api';
-import { TopBar } from '../../components/TopBar';
-import { APP_DISPLAY_NAME } from '../../config/appDisplayName';
-import type { PostsMainCompositeProps } from '../../navigation/screenTypes';
-import { useAppQuery } from '../../query/hooks/useAppQuery';
-import { postService } from '../../services/postService';
-import { useThemedStyles } from '../../theme/useThemedStyles';
-import { InlineLoading } from '../../utils/loading';
-import { ErrorStateView, EmptyStateView } from '../../utils/emptyErrorStates';
+import type { Post } from "../../api/types/api";
+import { TopBar } from "../../components/TopBar";
+import { APP_DISPLAY_NAME } from "../../config/appDisplayName";
+import type { PostsMainCompositeProps } from "../../navigation/screenTypes";
+import { useAppQuery } from "../../query/hooks/useAppQuery";
+import { postService } from "../../services/postService";
+import { useThemedStyles } from "../../theme/useThemedStyles";
+import { InlineLoading } from "../../utils/loading";
+import { ErrorStateView, EmptyStateView } from "../../utils/emptyErrorStates";
 
 type Props = PostsMainCompositeProps;
 
@@ -24,9 +24,9 @@ const PostsScreen = ({ navigation }: Props) => {
     isPending,
     error,
     refetch,
-  } = useAppQuery(['posts', useInvalidUrl], () =>
+  } = useAppQuery(["posts", useInvalidUrl], () =>
     useInvalidUrl
-      ? Promise.reject(new Error('Network request failed'))
+      ? Promise.reject(new Error("Network request failed"))
       : postService.getPosts(),
   );
 
@@ -41,14 +41,14 @@ const PostsScreen = ({ navigation }: Props) => {
       },
       centered: {
         flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: "center",
+        justifyContent: "center",
         padding: 16,
         backgroundColor: colors.background,
       },
       title: {
         fontSize: 22,
-        fontWeight: '700',
+        fontWeight: "700",
         marginBottom: 12,
         color: colors.text1,
       },
@@ -57,7 +57,7 @@ const PostsScreen = ({ navigation }: Props) => {
         borderBottomWidth: StyleSheet.hairlineWidth,
         borderBottomColor: colors.grayBackground,
       },
-      rowTitle: { fontSize: 16, fontWeight: '600', color: colors.text1 },
+      rowTitle: { fontSize: 16, fontWeight: "600", color: colors.text1 },
       rowBody: {
         fontSize: 14,
         opacity: 0.75,
@@ -70,7 +70,7 @@ const PostsScreen = ({ navigation }: Props) => {
         paddingHorizontal: 12,
         backgroundColor: colors.grayBackground,
         borderRadius: 8,
-        alignSelf: 'flex-start',
+        alignSelf: "flex-start",
       },
       toggleText: {
         fontSize: 14,
@@ -108,9 +108,9 @@ const PostsScreen = ({ navigation }: Props) => {
         {menuBar}
         <View style={styles.centered}>
           <ErrorStateView
-            title={t('errorBoundary.title')}
+            title={t("errorBoundary.title")}
             message="Unable to load posts. Please check your connection and try again."
-            retryLabel={t('errorBoundary.tryAgain')}
+            retryLabel={t("errorBoundary.tryAgain")}
             onRetry={handleRetry}
             layout="fullscreen"
           />
@@ -125,7 +125,7 @@ const PostsScreen = ({ navigation }: Props) => {
     <View style={styles.root}>
       {menuBar}
       <View style={styles.container}>
-        <Text style={styles.title}>{t('posts.title')}</Text>
+        <Text style={styles.title}>{t("posts.title")}</Text>
         <Pressable
           style={styles.toggleButton}
           onPress={() => setUseInvalidUrl(!useInvalidUrl)}
@@ -133,19 +133,19 @@ const PostsScreen = ({ navigation }: Props) => {
           accessibilityLabel="Toggle error state demo"
         >
           <Text style={styles.toggleText}>
-            {useInvalidUrl ? 'Use valid URL' : 'Simulate error (invalid URL)'}
+            {useInvalidUrl ? "Use valid URL" : "Simulate error (invalid URL)"}
           </Text>
         </Pressable>
         {emptyPosts ? (
           <EmptyStateView
-            title={t('posts.empty')}
+            title={t("posts.empty")}
             description="There are no posts to display right now."
             layout="inline"
           />
         ) : (
           <FlatList<Post>
             data={posts ?? []}
-            keyExtractor={item => String(item.id)}
+            keyExtractor={(item) => String(item.id)}
             renderItem={({ item }) => (
               <View style={styles.row}>
                 <Text style={styles.rowTitle}>{item.title}</Text>

@@ -1,6 +1,6 @@
-import React, { type ReactNode } from 'react';
+import React, { type ReactNode } from "react";
 
-import { ErrorBoundaryFallback } from './ErrorBoundaryFallback';
+import { ErrorBoundaryFallback } from "./ErrorBoundaryFallback";
 
 export type ErrorBoundaryProps = {
   children: ReactNode;
@@ -28,7 +28,8 @@ export class ErrorBoundary extends React.Component<
     return { hasError: true, error };
   }
 
-  componentDidCatch(): void {}
+  componentDidCatch(): void {
+  }
 
   handleRetry = (): void => {
     this.props.onRecover?.();

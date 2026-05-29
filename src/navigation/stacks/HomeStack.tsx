@@ -1,10 +1,10 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import React from "react";
+import { useTranslation } from "react-i18next";
 
-import { HomeDetailScreen } from '../../screens/home/HomeDetailScreen';
-import { HomeScreen } from '../../screens/home/HomeScreen';
-import type { HomeStackParamList } from '../types';
+import { HomeDetailScreen } from "../../screens/home/HomeDetailScreen";
+import { HomeScreen } from "../../screens/home/HomeScreen";
+import type { HomeStackParamList } from "../types";
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
 
@@ -17,7 +17,7 @@ export function HomeStack() {
       <Stack.Screen
         name="HomeDetail"
         component={HomeDetailScreen}
-        options={{ headerShown: true, title: t('stacks.homeDetailTitle') }}
+        options={{ headerShown: true, title: t("stacks.homeDetailTitle") }}
       />
     </Stack.Navigator>
   );

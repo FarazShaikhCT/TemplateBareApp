@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 # You may use http://rbenv.org/ or https://rvm.io/ to install and use this version
 ruby ">= 2.6.10"
 
-# Align with CI (CocoaPods 1.16.x).
+# CocoaPods 1.16.x matches common macOS CI images; requires xcodeproj >= 1.27.
 gem 'cocoapods', '>= 1.16', '< 1.17'
 gem 'activesupport', '>= 6.1.7.5', '!= 7.1.0'
 gem 'xcodeproj', '>= 1.27.0', '< 2.0'
@@ -16,5 +16,5 @@ gem 'benchmark'
 gem 'mutex_m'
 gem 'nkf'
 
-# Fastlane (CI: Firebase / TestFlight) — GitHub Actions uses Ruby 3.2 + Bundler 2.4.x
+# Fastlane (CI: TestFlight) — use Ruby 3.1 in CI; see README
 gem "fastlane", "~> 2.225"

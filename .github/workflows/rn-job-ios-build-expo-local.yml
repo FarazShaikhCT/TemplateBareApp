@@ -50,7 +50,7 @@ jobs:
           path: |
             ios/Pods
             ~/Library/Caches/CocoaPods
-          key: pods-${{ runner.os }}-${{ hashFiles('ios/Podfile.lock') }}
+          key: pods-${{ runner.os }}-${{ hashFiles('ios/Podfile.lock', 'ios/Podfile') }}
       - name: pod install
         run: bundle exec pod install --project-directory=ios
       - uses: expo/expo-github-action@v8

@@ -5,6 +5,6 @@ export const ApiEndpoints = {
   //   detail: (id: string) => `/users/${id}`,
   // },
   posts: {
-    list: () => '/posts',
+    list: () => "/posts",
   },
 } as const;

@@ -1,7 +1,7 @@
-import React from 'react';
-import { useTranslation } from 'react-i18next';
+import React from "react";
+import { useTranslation } from "react-i18next";
 
-import { ErrorStateView } from '../emptyErrorStates/ErrorStateView';
+import { ErrorStateView } from "../emptyErrorStates/ErrorStateView";
 
 export type ErrorBoundaryFallbackProps = {
   error: Error | null;
@@ -18,11 +18,11 @@ export function ErrorBoundaryFallback({
 
   return (
     <ErrorStateView
-      title={t('errorBoundary.title')}
-      message={t('errorBoundary.fallbackMessage')}
-      retryLabel={t('errorBoundary.tryAgain')}
+      title={t("errorBoundary.title")}
+      message={t("errorBoundary.fallbackMessage")}
+      retryLabel={t("errorBoundary.tryAgain")}
       onRetry={onRetry}
-      layout={embedded ? 'inline' : 'fullscreen'}
+      layout={embedded ? "inline" : "fullscreen"}
     />
   );
 }

@@ -1,4 +1,4 @@
-import type { LoadingConfig } from './types';
+import type { LoadingConfig } from "./types";
 
 type LoadingCallback = (config: LoadingConfig | null) => void;
 

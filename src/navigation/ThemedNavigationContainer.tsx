@@ -1,10 +1,10 @@
-import { NavigationContainer } from '@react-navigation/native';
-import { StatusBar } from 'react-native';
+import { NavigationContainer } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar";
 
-import { useAppTheme } from '../theme/ThemeContext';
-import { linking } from './linking';
-import { navigationRef } from './navigationRef';
-import { RootNavigator } from './RootNavigator';
+import { useAppTheme } from "../theme/ThemeContext";
+import { linking } from "./linking";
+import { navigationRef } from "./navigationRef";
+import { RootNavigator } from "./RootNavigator";
 
 export function ThemedNavigationContainer() {
   const { theme, navigationTheme } = useAppTheme();
@@ -15,11 +15,7 @@ export function ThemedNavigationContainer() {
       theme={navigationTheme}
       linking={linking}
     >
-      <StatusBar
-        barStyle={theme === 'dark' ? 'light-content' : 'dark-content'}
-        translucent={false}
-        backgroundColor="transparent"
-      />
+      <StatusBar style={theme === "dark" ? "light" : "dark"} />
       <RootNavigator />
     </NavigationContainer>
   );

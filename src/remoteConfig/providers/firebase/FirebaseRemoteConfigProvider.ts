@@ -18,9 +18,7 @@ export class FirebaseRemoteConfigProvider implements IRemoteConfigProvider {
 
   private async applyFetchIntervalSettings(): Promise<void> {
     await setConfigSettings(this.rc, {
-      minimumFetchIntervalMillis: __DEV__
-        ? 0
-        : PRODUCTION_MIN_FETCH_INTERVAL_MS,
+      minimumFetchIntervalMillis: __DEV__ ? 0 : PRODUCTION_MIN_FETCH_INTERVAL_MS,
     });
   }
 

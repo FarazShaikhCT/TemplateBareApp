@@ -1,10 +1,10 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import React from "react";
+import { useTranslation } from "react-i18next";
 
-import { ProfileScreen } from '../../screens/profile/ProfileScreen';
-import { SettingsScreen } from '../../screens/profile/SettingsScreen';
-import type { ProfileStackParamList } from '../types';
+import { ProfileScreen } from "../../screens/profile/ProfileScreen";
+import { SettingsScreen } from "../../screens/profile/SettingsScreen";
+import type { ProfileStackParamList } from "../types";
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
 
@@ -17,7 +17,7 @@ export function ProfileStack() {
       <Stack.Screen
         name="Settings"
         component={SettingsScreen}
-        options={{ headerShown: true, title: t('stacks.settingsTitle') }}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );

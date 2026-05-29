@@ -182,7 +182,7 @@ GEM
       xcpretty (~> 0.4.1)
       xcpretty-travis-formatter (>= 0.0.3, < 2.0.0)
     fastlane-sirp (1.1.0)
-    ffi (1.17.4-arm64-darwin)
+    ffi (1.17.4)
     fourflusher (2.3.1)
     fuzzy_match (2.0.4)
     gh_inspector (1.1.3)
@@ -302,7 +302,7 @@ GEM
       xcpretty (~> 0.2, >= 0.0.7)
 
 PLATFORMS
-  arm64-darwin-24
+  ruby
 
 DEPENDENCIES
   activesupport (>= 6.1.7.5, != 7.1.0)
@@ -317,7 +317,7 @@ DEPENDENCIES
   xcodeproj (>= 1.27.0, < 2.0)
 
 RUBY VERSION
-   ruby 3.4.5p51
+   ruby 3.2.9p265
 
 BUNDLED WITH
    2.4.12

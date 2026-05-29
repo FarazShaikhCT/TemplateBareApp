@@ -15,7 +15,7 @@ on:
       gradle_task:
         required: false
         type: string
-        default: assembleProdRelease
+        default: assembleTemplateExpoTemplateExpoDevRelease
       gradle_project_dir:
         required: false
         type: string
@@ -74,6 +74,11 @@ jobs:
           ref: ${{ inputs.branch }}
           fetch-depth: 0
 
+      - name: Ensure react-native-config env file
+        run: |
+          FLAVOR=$(echo "${{ inputs.gradle_task }}" | sed 's/^assemble//;s/Release$//;s/Debug$//' | tr '[:upper:]' '[:lower:]')
+          bash .github/scripts/ensure_react_native_config_env.sh "${FLAVOR:-dev}"
+
       - name: Restore Firebase client config
         uses: ./.github/actions/restore-firebase-client-config
         with:
@@ -95,7 +100,7 @@ jobs:
             exit 1
           fi
 
-          # Derive flavor: assembleDevRelease → dev, assembleProdRelease → prod
+          # Derive flavor: assembleTemplateExpoDevRelease → dev, assembleTemplateExpoTemplateExpoDevRelease → prod
           FLAVOR=$(echo "$TASK" | sed 's/^assemble//;s/Release$//;s/Debug$//' | tr '[:upper:]' '[:lower:]')
 
           # POSIX-friendly: Ubuntu default awk (mawk) does not support \b / \s used in earlier patterns.

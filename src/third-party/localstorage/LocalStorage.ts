@@ -1,4 +1,4 @@
-import { LocalStorageKey } from './LocalStorageKeys';
+import { LocalStorageKey } from "./LocalStorageKeys";
 
 export interface LocalStorage {
   setValue: <T extends string | number | boolean>(

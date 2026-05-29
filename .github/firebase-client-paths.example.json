@@ -6,11 +6,11 @@
   "ios": {
     "dev": [
       "GoogleService-Info.plist",
-      "ios/TemplateBareApp/GoogleService-Info.plist"
+      "ios/TemplatePipelineReactNative/GoogleService-Info.plist"
     ],
     "dist": [
       "GoogleService-Info.plist",
-      "ios/TemplateBareApp/GoogleService-Info.plist"
+      "ios/TemplatePipelineReactNative/GoogleService-Info.plist"
     ]
   }
 }

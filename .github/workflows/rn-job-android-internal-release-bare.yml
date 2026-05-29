@@ -17,7 +17,7 @@ on:
       gradle_task:
         required: false
         type: string
-        default: assembleProdRelease
+        default: assembleTemplateExpoTemplateExpoDevRelease
       gradle_project_dir:
         required: false
         type: string
@@ -51,7 +51,7 @@ jobs:
       - name: Restore Firebase client config
         uses: ./.github/actions/restore-firebase-client-config
         with:
-          firebase_flavor: ${{ contains(inputs.gradle_task, 'Dev') && 'dev' || 'dist' }}
+          firebase_flavor: ${{ contains(inputs.gradle_task, 'TemplateExpoDev') && 'dev' || 'dist' }}
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
           GOOGLE_SERVICE_INFO_PLIST_DEV: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST_DEV }}
@@ -69,7 +69,7 @@ jobs:
             exit 1
           fi
 
-          # Derive flavor: assembleDevRelease → dev, assembleProdRelease → prod
+          # Derive flavor: assembleTemplateExpoDevRelease → dev, assembleTemplateExpoTemplateExpoDevRelease → prod
           FLAVOR=$(echo "$TASK" | sed 's/^assemble//;s/Release$//;s/Debug$//' | tr '[:upper:]' '[:lower:]')
 
           # POSIX-friendly: Ubuntu default awk (mawk) does not support \b / \s used in earlier patterns.

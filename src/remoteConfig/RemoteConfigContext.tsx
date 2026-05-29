@@ -15,10 +15,7 @@ import { AppState, type AppStateStatus } from 'react-native';
 
 import { createRemoteConfigProvider } from './createRemoteConfigProvider';
 import type { IRemoteConfigProvider } from './providers/IRemoteConfigProvider';
-import {
-  REMOTE_CONFIG_DEFAULTS,
-  REMOTE_CONFIG_KEYS,
-} from './remoteConfigDefaults';
+import { REMOTE_CONFIG_DEFAULTS, REMOTE_CONFIG_KEYS } from './remoteConfigDefaults';
 
 /** Current Remote Config parameter values and SDK read metadata (last fetch). */
 export type RemoteConfigKeyValue = {
@@ -37,9 +34,7 @@ export type RemoteConfigContextValue = {
   refresh: () => Promise<boolean>;
 };
 
-const RemoteConfigContext = createContext<RemoteConfigContextValue | null>(
-  null,
-);
+const RemoteConfigContext = createContext<RemoteConfigContextValue | null>(null);
 
 function defaultSnapshot(): RemoteConfigKeyValue {
   return {
@@ -63,32 +58,20 @@ function defaultSnapshot(): RemoteConfigKeyValue {
 
 function readSnapshot(provider: IRemoteConfigProvider): RemoteConfigKeyValue {
   return {
-    showLanguagePicker: provider.getBoolean(
-      REMOTE_CONFIG_KEYS.showLanguagePicker,
-    ),
+    showLanguagePicker: provider.getBoolean(REMOTE_CONFIG_KEYS.showLanguagePicker),
     showThemeToggle: provider.getBoolean(REMOTE_CONFIG_KEYS.showThemeToggle),
     demoMessage: provider.getString(REMOTE_CONFIG_KEYS.demoMessage),
-    demoFeatureEnabled: provider.getBoolean(
-      REMOTE_CONFIG_KEYS.demoFeatureEnabled,
-    ),
-    demoRolloutPercent: provider.getNumber(
-      REMOTE_CONFIG_KEYS.demoRolloutPercent,
-    ),
+    demoFeatureEnabled: provider.getBoolean(REMOTE_CONFIG_KEYS.demoFeatureEnabled),
+    demoRolloutPercent: provider.getNumber(REMOTE_CONFIG_KEYS.demoRolloutPercent),
     lastFetchStatus: provider.getLastFetchStatus(),
     fetchTimeMillis: provider.getFetchTimeMillis(),
   };
 }
 
-export function RemoteConfigProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function RemoteConfigProvider({ children }: { children: React.ReactNode }) {
   const provider = useMemo(() => createRemoteConfigProvider(), []);
   const [ready, setReady] = useState(false);
-  const [snapshot, setSnapshot] = useState<RemoteConfigKeyValue>(() =>
-    defaultSnapshot(),
-  );
+  const [snapshot, setSnapshot] = useState<RemoteConfigKeyValue>(() => defaultSnapshot());
 
   const syncFromProvider = useCallback(() => {
     setSnapshot(readSnapshot(provider));
@@ -175,9 +158,7 @@ export function RemoteConfigProvider({
   );
 
   return (
-    <RemoteConfigContext.Provider value={value}>
-      {children}
-    </RemoteConfigContext.Provider>
+    <RemoteConfigContext.Provider value={value}>{children}</RemoteConfigContext.Provider>
   );
 }
 

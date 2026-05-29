@@ -1,11 +1,11 @@
-import React from 'react';
-import { Pressable, Text, View } from 'react-native';
+import React from "react";
+import { Pressable, Text, View } from "react-native";
 
-import { BorderRadiusToken } from '../../designSystem/generated/borderRadius';
-import { FontSizeToken } from '../../designSystem/generated/fontSize';
-import { LineHeightToken } from '../../designSystem/generated/lineHeight';
-import { SpacingToken } from '../../designSystem/generated/spacing';
-import { useThemedStyles } from '../../theme/useThemedStyles';
+import { BorderRadiusToken } from "../../designSystem/generated/borderRadius";
+import { FontSizeToken } from "../../designSystem/generated/fontSize";
+import { LineHeightToken } from "../../designSystem/generated/lineHeight";
+import { SpacingToken } from "../../designSystem/generated/spacing";
+import { useThemedStyles } from "../../theme/useThemedStyles";
 
 export type ErrorStateViewProps = {
   title: string;
@@ -13,7 +13,7 @@ export type ErrorStateViewProps = {
   details?: string;
   retryLabel?: string;
   onRetry?: () => void;
-  layout?: 'inline' | 'fullscreen';
+  layout?: "inline" | "fullscreen";
 };
 
 export function ErrorStateView({
@@ -22,17 +22,15 @@ export function ErrorStateView({
   details,
   retryLabel,
   onRetry,
-  layout = 'inline',
+  layout = "inline",
 }: ErrorStateViewProps) {
-  const fullscreen = layout === 'fullscreen';
+  const fullscreen = layout === "fullscreen";
 
   const styles = useThemedStyles(
-    c => ({
+    (c) => ({
       root: {
-        ...(fullscreen
-          ? { flex: 1 as const, justifyContent: 'center' as const }
-          : {}),
-        alignItems: 'center',
+        ...(fullscreen ? { flex: 1 as const, justifyContent: "center" as const } : {}),
+        alignItems: "center",
         paddingHorizontal: SpacingToken.spacing_value_6,
         paddingVertical: SpacingToken.spacing_value_8,
       },
@@ -40,9 +38,9 @@ export function ErrorStateView({
         width: SpacingToken.spacing_value_16,
         height: SpacingToken.spacing_value_16,
         borderRadius: BorderRadiusToken.full,
-        backgroundColor: c.error + '15',
-        alignItems: 'center',
-        justifyContent: 'center',
+        backgroundColor: c.error + "15",
+        alignItems: "center",
+        justifyContent: "center",
         marginBottom: SpacingToken.spacing_value_5,
       },
       iconText: {
@@ -50,23 +48,23 @@ export function ErrorStateView({
       },
       title: {
         fontSize: FontSizeToken.heading_sm,
-        fontWeight: '700',
+        fontWeight: "700",
         color: c.text1,
-        textAlign: 'center',
+        textAlign: "center",
         marginBottom: SpacingToken.spacing_value_2,
       },
       message: {
         fontSize: FontSizeToken.body_md,
         lineHeight: LineHeightToken.body_md,
         color: c.text2,
-        textAlign: 'center',
+        textAlign: "center",
         marginBottom: SpacingToken.spacing_value_2,
       },
       details: {
         fontSize: FontSizeToken.label_md,
         lineHeight: LineHeightToken.label_md,
         color: c.text3,
-        textAlign: 'center',
+        textAlign: "center",
         marginBottom: SpacingToken.spacing_value_6,
       },
       retryButton: {
@@ -78,9 +76,9 @@ export function ErrorStateView({
       },
       retryLabel: {
         fontSize: FontSizeToken.body_md,
-        fontWeight: '600',
+        fontWeight: "600",
         color: c.textOnPrimary,
-        textAlign: 'center',
+        textAlign: "center",
       },
     }),
     [fullscreen],
@@ -100,10 +98,7 @@ export function ErrorStateView({
       ) : null}
       {retryLabel && onRetry ? (
         <Pressable
-          style={({ pressed }) => [
-            styles.retryButton,
-            pressed && { opacity: 0.88 },
-          ]}
+          style={({ pressed }) => [styles.retryButton, pressed && { opacity: 0.88 }]}
           onPress={onRetry}
           accessibilityRole="button"
           accessibilityLabel={retryLabel}

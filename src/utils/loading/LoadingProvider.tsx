@@ -1,8 +1,8 @@
-import React, { useCallback, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import type { LoadingConfig } from './types';
-import { LoadingOverlay } from './LoadingOverlay';
-import { LoadingManager } from './LoadingManager';
+import React, { useCallback, useState } from "react";
+import { View, StyleSheet } from "react-native";
+import type { LoadingConfig } from "./types";
+import { LoadingOverlay } from "./LoadingOverlay";
+import { LoadingManager } from "./LoadingManager";
 
 interface LoadingProviderProps {
   children: React.ReactNode;

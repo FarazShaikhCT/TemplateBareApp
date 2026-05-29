@@ -1,61 +1,43 @@
 apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
-apply plugin: "com.google.gms.google-services"
-apply plugin: "com.google.firebase.crashlytics"
 
-/**
- * react-native-config (Android): do NOT use stock `dotenv.gradle` alone — it calls `loadDotEnv()`
- * once at configuration time. Gradle sync / generic tasks often yield no flavor match, so it
- * falls back to `.env`, and `defaultConfig` would get one env map for every variant.
- *
- * We inject `.env.dev` / `.env.qa` / `.env.prod` per merged variant (`devDebug`, `qaRelease`, …).
- */
-
-ext.readEnvFileForRnc = { File f ->
-    def env = [:]
-    if (!f.exists()) return env
-    f.eachLine { line ->
-        def trimmed = line.trim()
-        if (trimmed.isEmpty() || trimmed.startsWith('#')) return
-        def exportStripped = trimmed.replaceFirst(/^export\s+/, '')
-        def eq = exportStripped.indexOf('=')
-        if (eq <= 0) return
-        def key = exportStripped.substring(0, eq).trim()
-        def val = exportStripped.substring(eq + 1).trim()
-        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
-            val = val.substring(1, val.length() - 1)
-        }
-        if (!key.isEmpty()) env.put(key, val)
-    }
-    return env
-}
+def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
 
 /**
  * This is the configuration block to customize your React Native Android app.
  * By default you don't need to apply any configuration, just uncomment the lines you need.
  */
 react {
+    entryFile = file(["node", "-e", "require('expo/scripts/resolveAppEntry')", projectRoot, "android", "absolute"].execute(null, rootDir).text.trim())
+    reactNativeDir = new File(["node", "--print", "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim()).getParentFile().getAbsoluteFile()
+    hermesCommand = new File(["node", "--print", "require.resolve('hermes-compiler/package.json', { paths: [require.resolve('react-native/package.json')] })"].execute(null, rootDir).text.trim()).getParentFile().getAbsolutePath() + "/hermesc/%OS-BIN%/hermesc"
+    codegenDir = new File(["node", "--print", "require.resolve('@react-native/codegen/package.json', { paths: [require.resolve('react-native/package.json')] })"].execute(null, rootDir).text.trim()).getParentFile().getAbsoluteFile()
+
+    enableBundleCompression = (findProperty('android.enableBundleCompression') ?: false).toBoolean()
+    // Use Expo CLI to bundle the app, this ensures the Metro config
+    // works correctly with Expo projects.
+    cliFile = new File(["node", "--print", "require.resolve('@expo/cli', { paths: [require.resolve('expo/package.json')] })"].execute(null, rootDir).text.trim())
+    bundleCommand = "export:embed"
+
     /* Folders */
-    //   The root of your project, i.e. where "package.json" lives. Default is '../..'
+     //   The root of your project, i.e. where "package.json" lives. Default is '../..'
     // root = file("../../")
     //   The folder where the react-native NPM package is. Default is ../../node_modules/react-native
     // reactNativeDir = file("../../node_modules/react-native")
     //   The folder where the react-native Codegen package is. Default is ../../node_modules/@react-native/codegen
     // codegenDir = file("../../node_modules/@react-native/codegen")
-    //   The cli.js file which is the React Native CLI entrypoint. Default is ../../node_modules/react-native/cli.js
-    // cliFile = file("../../node_modules/react-native/cli.js")
 
     /* Variants */
-    //   Only debug variants skip JS bundling and use Metro. Release variants always bundle.
-    debuggableVariants = ["devDebug", "qaDebug", "prodDebug"]
+    //   The list of variants to that are debuggable. For those we're going to
+    //   skip the bundling of the JS bundle and the assets. By default is just 'debug'.
+    //   If you add flavors like lite, prod, etc. you'll have to list your debuggableVariants.
+    // debuggableVariants = ["liteDebug", "prodDebug"]
 
     /* Bundling */
     //   A list containing the node command and its flags. Default is just 'node'.
     // nodeExecutableAndArgs = ["node"]
-    //
-    //   The command to run when bundling. By default is 'bundle'
-    // bundleCommand = "ram-bundle"
+
     //
     //   The path to the CLI configuration file. Default is empty.
     // bundleConfig = file(../rn-cli.config.js)
@@ -81,13 +63,16 @@ react {
     autolinkLibrariesWithApp()
 }
 
-apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
+/**
+ * Set this to true in release builds to optimize the app using [R8](https://developer.android.com/topic/performance/app-optimization/enable-app-optimization).
+ */
+def enableMinifyInReleaseBuilds = (findProperty('android.enableMinifyInReleaseBuilds') ?: false).toBoolean()
 
 /**
  * The preferred build flavor of JavaScriptCore (JSC)
  *
  * For example, to use the international variant, you can use:
- * `def jscFlavor = io.github.react-native-community:jsc-android-intl:2026004.+`
+ * `def jscFlavor = 'org.webkit:android-jsc-intl:+'`
  *
  * The international variant includes ICU i18n library and necessary data
  * allowing to use e.g. `Date.toLocaleString` and `String.localeCompare` that
@@ -98,50 +83,20 @@ def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
 android {
     ndkVersion rootProject.ext.ndkVersion
+
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    buildFeatures {
-        buildConfig true
-    }
-
-    namespace "com.codeandtheory.templatepipelinetest"
+    namespace 'com.codeandtheory.templatepipelinetest.dev'
     defaultConfig {
-        applicationId "com.codeandtheory.templatepipelinetest"
+        applicationId 'com.codeandtheory.templatepipelinetest.dev'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0"
-        // react-native-config: BuildConfig lives in `namespace`, not in applicationId when using
-        // applicationIdSuffix — without this, native code resolves the wrong class and env is wrong.
-        //
-        // Resource shrinking (buildTypes.release shrinkResources) can strip unused strings. The
-        // `build_config_package` string is kept via app/src/main/res/raw/keep.xml (tools:keep).
-        // If you rename or remove this resValue key, update keep.xml in the same change.
-        resValue "string", "build_config_package", "com.codeandtheory.templatepipelinetest"
-    }
+        versionName "1.0.0"
 
-    flavorDimensions "env"
-    productFlavors {
-        dev {
-            dimension "env"
-            applicationIdSuffix ".dev"
-            resValue "string", "app_name", "TemplateBareApp Dev"
-            buildConfigField "String", "ENV", '"development"'
-        }
-        qa {
-            dimension "env"
-            applicationIdSuffix ".qa"
-            resValue "string", "app_name", "TemplateBareApp QA"
-            buildConfigField "String", "ENV", '"staging"'
-        }
-        prod {
-            dimension "env"
-            resValue "string", "app_name", "TemplateBareApp"
-            buildConfigField "String", "ENV", '"production"'
-        }
+        buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
     }
-
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
@@ -153,33 +108,46 @@ android {
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
-            debuggable true
         }
         release {
-            // Caution! In production, replace the debug keystore with a real release keystore.
-            // See https://reactnative.dev/docs/signed-apk-android
+            // Caution! In production, you need to generate your own keystore file.
+            // see https://reactnative.dev/docs/signed-apk-android.
             signingConfig signingConfigs.debug
-            debuggable false
-            minifyEnabled true
-            shrinkResources true
-            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+            def enableShrinkResources = findProperty('android.enableShrinkResourcesInReleaseBuilds') ?: 'false'
+            shrinkResources enableShrinkResources.toBoolean()
+            minifyEnabled enableMinifyInReleaseBuilds
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            def enablePngCrunchInRelease = findProperty('android.enablePngCrunchInReleaseBuilds') ?: 'true'
+            crunchPngs enablePngCrunchInRelease.toBoolean()
         }
     }
-
-    applicationVariants.configureEach { variant ->
-        def appRoot = rootProject.projectDir.parentFile
-        def envFlavor = variant.productFlavors.find { it.dimension == 'env' }?.name?.toLowerCase()
-        def envRel = envFlavor == 'qa'
-                ? '.env.qa'
-                : envFlavor == 'prod' ? '.env.prod' : '.env.dev'
-        def envFile = new File(appRoot, envRel)
-        if (!envFile.exists()) {
-            logger.lifecycle("react-native-config: missing env file ${envFile} for variant ${variant.name}")
+    packagingOptions {
+        jniLibs {
+            def enableLegacyPackaging = findProperty('expo.useLegacyPackaging') ?: 'false'
+            useLegacyPackaging enableLegacyPackaging.toBoolean()
         }
-        def envMap = project.readEnvFileForRnc(envFile)
-        envMap.each { k, val ->
-            def escaped = "${val}".replaceAll('%', '\\\\u0025').replace('"', '\\"')
-            variant.buildConfigField 'String', "${k}", "\"${escaped}\""
+    }
+    androidResources {
+        ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~'
+    }
+}
+
+// Apply static values from `gradle.properties` to the `android.packagingOptions`
+// Accepts values in comma delimited lists, example:
+// android.packagingOptions.pickFirsts=/LICENSE,**/picasa.ini
+["pickFirsts", "excludes", "merges", "doNotStrip"].each { prop ->
+    // Split option: 'foo,bar' -> ['foo', 'bar']
+    def options = (findProperty("android.packagingOptions.$prop") ?: "").split(",");
+    // Trim all elements in place.
+    for (i in 0..<options.size()) options[i] = options[i].trim();
+    // `[] - ""` is essentially `[""].filter(Boolean)` removing all empty strings.
+    options -= ""
+
+    if (options.length > 0) {
+        println "android.packagingOptions.$prop += $options ($options.length)"
+        // Ex: android.packagingOptions.pickFirsts += '**/SCCS/**'
+        options.each {
+            android.packagingOptions[prop] += it
         }
     }
 }
@@ -188,9 +156,30 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
+    def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
+    def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";
+    def isWebpAnimatedEnabled = (findProperty('expo.webp.animated') ?: "") == "true";
+
+    if (isGifEnabled) {
+        // For animated gif support
+        implementation("com.facebook.fresco:animated-gif:${expoLibs.versions.fresco.get()}")
+    }
+
+    if (isWebpEnabled) {
+        // For webp support
+        implementation("com.facebook.fresco:webpsupport:${expoLibs.versions.fresco.get()}")
+        if (isWebpAnimatedEnabled) {
+            // Animated webp support
+            implementation("com.facebook.fresco:animated-webp:${expoLibs.versions.fresco.get()}")
+        }
+    }
+
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {
         implementation jscFlavor
     }
 }
+
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'

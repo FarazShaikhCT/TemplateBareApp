@@ -6,10 +6,10 @@ on:
     inputs:
       ios_workspace:
         type: string
-        default: ios/TemplateBareApp.xcworkspace
+        default: ios/TemplateExpoTemplateExpoDev.xcworkspace
       ios_scheme:
         type: string
-        default: Dev
+        default: TemplateExpoDev
       simulator_destination:
         type: string
         default: auto
@@ -63,7 +63,7 @@ jobs:
           path: |
             ios/Pods
             ~/Library/Caches/CocoaPods
-          key: pods-${{ runner.os }}-${{ hashFiles('ios/Podfile.lock') }}
+          key: pods-${{ runner.os }}-${{ hashFiles('ios/Podfile.lock', 'ios/Podfile') }}
       - name: pod install
         run: bundle exec pod install --project-directory=ios
       - name: Run unit tests with coverage

@@ -1,22 +1,22 @@
-import type { LinkingOptions } from '@react-navigation/native';
-import { Linking } from 'react-native';
+import type { LinkingOptions } from "@react-navigation/native";
+import * as ExpoLinking from "expo-linking";
 
-import type { RootStackParamList } from './types';
+import type { RootStackParamList } from "./types";
 
 /**
- * Deep linking config. Test with:
- * npx uri-scheme open templatebareapp://home --ios
- * Adjust prefixes to match your app scheme (see app.json / native config).
+ * Deep linking — scheme must match `scheme` in app.config.ts / app.json.
+ * Prefixes include Expo's canonical URL (`createURL`) plus the explicit scheme for CLI tools.
+ * Test: npx uri-scheme open exporn://home --ios
  */
-export const deepLinkSchemePrefix = 'templatebareapp://';
+export const deepLinkSchemePrefix = "exporn://";
 
 export const linking: LinkingOptions<RootStackParamList> = {
-  prefixes: [deepLinkSchemePrefix],
+  prefixes: [ExpoLinking.createURL("/"), deepLinkSchemePrefix],
   async getInitialURL() {
-    return Linking.getInitialURL();
+    return ExpoLinking.getInitialURL();
   },
   subscribe(listener) {
-    const subscription = Linking.addEventListener('url', ({ url }) => {
+    const subscription = ExpoLinking.addEventListener("url", ({ url }) => {
       listener(url);
     });
     return () => subscription.remove();
@@ -29,37 +29,37 @@ export const linking: LinkingOptions<RootStackParamList> = {
             screens: {
               HomeTab: {
                 screens: {
-                  HomeMain: 'home',
-                  HomeDetail: 'home/detail/:itemId',
+                  HomeMain: "home",
+                  HomeDetail: "home/detail/:itemId",
                 },
               },
               ExploreTab: {
                 screens: {
-                  ExploreMain: 'explore',
-                  ExploreDetail: 'explore/detail/:section',
+                  ExploreMain: "explore",
+                  ExploreDetail: "explore/detail/:section",
                 },
               },
               ProfileTab: {
                 screens: {
-                  ProfileMain: 'profile',
-                  Settings: 'profile/settings',
+                  ProfileMain: "profile",
+                  Settings: "profile/settings",
                 },
               },
               PostsTab: {
                 screens: {
-                  PostsMain: 'posts',
+                  PostsMain: "posts",
                 },
               },
             },
           },
-          About: 'about',
-          NotificationsCatalog: 'notifications',
-          CarouselCatalog: 'carousel',
+          About: "about",
+          NotificationsCatalog: "notifications",
+          CarouselCatalog: "carousel",
         },
       },
-      ExampleModal: 'modal/presentation',
-      TransparentModal: 'modal/transparent',
-      FullScreenModal: 'modal/fullscreen',
+      ExampleModal: "modal/presentation",
+      TransparentModal: "modal/transparent",
+      FullScreenModal: "modal/fullscreen",
     },
   },
 };

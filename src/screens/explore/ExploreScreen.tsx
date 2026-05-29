@@ -1,12 +1,12 @@
-import { DrawerActions } from '@react-navigation/native';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Pressable, Text, View } from 'react-native';
+import { DrawerActions } from "@react-navigation/native";
+import React from "react";
+import { useTranslation } from "react-i18next";
+import { Pressable, Text, View } from "react-native";
 
-import { TopBar } from '../../components/TopBar';
-import { APP_DISPLAY_NAME } from '../../config/appDisplayName';
-import type { ExploreMainCompositeProps } from '../../navigation/screenTypes';
-import { useThemedStyles } from '../../theme/useThemedStyles';
+import { TopBar } from "../../components/TopBar";
+import { APP_DISPLAY_NAME } from "../../config/appDisplayName";
+import type { ExploreMainCompositeProps } from "../../navigation/screenTypes";
+import { useThemedStyles } from "../../theme/useThemedStyles";
 
 type Props = ExploreMainCompositeProps;
 
@@ -22,14 +22,14 @@ export function ExploreScreen({ navigation }: Props) {
         backgroundColor: colors.background,
         paddingTop: 16,
       },
-      title: { fontSize: 22, fontWeight: '700', color: colors.text1 },
+      title: { fontSize: 22, fontWeight: "700", color: colors.text1 },
       btn: {
         backgroundColor: colors.secondary,
         paddingVertical: 12,
         paddingHorizontal: 14,
         borderRadius: 8,
       },
-      btnText: { color: colors.textOnSecondary, fontWeight: '600' },
+      btnText: { color: colors.textOnSecondary, fontWeight: "600" },
     }),
     [],
   );
@@ -41,26 +41,26 @@ export function ExploreScreen({ navigation }: Props) {
         onMenuPress={() => navigation.dispatch(DrawerActions.openDrawer())}
       />
       <View style={styles.container}>
-        <Text style={styles.title}>{t('explore.title')}</Text>
+        <Text style={styles.title}>{t("explore.title")}</Text>
 
         <Pressable
           style={styles.btn}
           onPress={() =>
-            navigation.navigate('ExploreDetail', { section: 'news' })
+            navigation.navigate("ExploreDetail", { section: "news" })
           }
         >
-          <Text style={styles.btnText}>{t('explore.navigateDetail')}</Text>
+          <Text style={styles.btnText}>{t("explore.navigateDetail")}</Text>
         </Pressable>
 
         <Pressable
           style={styles.btn}
           onPress={() =>
-            navigation.navigate('HomeTab', {
-              screen: 'HomeMain',
+            navigation.navigate("HomeTab", {
+              screen: "HomeMain",
             })
           }
         >
-          <Text style={styles.btnText}>{t('explore.switchHome')}</Text>
+          <Text style={styles.btnText}>{t("explore.switchHome")}</Text>
         </Pressable>
       </View>
     </View>

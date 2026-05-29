@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query';
+import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 
 export function useAppMutation<TData, TVariables>(
   mutationFn: (variables: TVariables) => Promise<TData>,
-  options?: Omit<UseMutationOptions<TData, Error, TVariables>, 'mutationFn'>,
+  options?: Omit<UseMutationOptions<TData, Error, TVariables>, "mutationFn">,
 ) {
   return useMutation<TData, Error, TVariables>({
     mutationFn,

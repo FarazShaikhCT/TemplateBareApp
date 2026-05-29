@@ -1,7 +1,7 @@
-import type { CompositeScreenProps } from '@react-navigation/native';
-import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import type { DrawerScreenProps } from '@react-navigation/drawer';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { CompositeScreenProps } from "@react-navigation/native";
+import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import type { DrawerScreenProps } from "@react-navigation/drawer";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import type {
   DrawerParamList,
@@ -10,7 +10,7 @@ import type {
   MainTabParamList,
   PostStackParamList,
   ProfileStackParamList,
-} from './types';
+} from "./types";
 
 type TabDrawerComposite = CompositeScreenProps<
   BottomTabScreenProps<MainTabParamList>,
@@ -18,21 +18,21 @@ type TabDrawerComposite = CompositeScreenProps<
 >;
 
 export type HomeMainCompositeProps = CompositeScreenProps<
-  NativeStackScreenProps<HomeStackParamList, 'HomeMain'>,
+  NativeStackScreenProps<HomeStackParamList, "HomeMain">,
   TabDrawerComposite
 >;
 
 export type ExploreMainCompositeProps = CompositeScreenProps<
-  NativeStackScreenProps<ExploreStackParamList, 'ExploreMain'>,
+  NativeStackScreenProps<ExploreStackParamList, "ExploreMain">,
   TabDrawerComposite
 >;
 
 export type ProfileMainCompositeProps = CompositeScreenProps<
-  NativeStackScreenProps<ProfileStackParamList, 'ProfileMain'>,
+  NativeStackScreenProps<ProfileStackParamList, "ProfileMain">,
   TabDrawerComposite
 >;
 
 export type PostsMainCompositeProps = CompositeScreenProps<
-  NativeStackScreenProps<PostStackParamList, 'PostsMain'>,
+  NativeStackScreenProps<PostStackParamList, "PostsMain">,
   TabDrawerComposite
 >;

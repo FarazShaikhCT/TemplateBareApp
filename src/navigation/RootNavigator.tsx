@@ -1,12 +1,12 @@
-import React from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useTranslation } from 'react-i18next';
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import React from "react";
+import { useTranslation } from "react-i18next";
 
-import { ExampleModalScreen } from '../screens/modals/ExampleModalScreen';
-import { FullScreenModalScreen } from '../screens/modals/FullScreenModalScreen';
-import { TransparentModalScreen } from '../screens/modals/TransparentModalScreen';
-import type { RootStackParamList } from './types';
-import { MainDrawer } from './MainDrawer';
+import { ExampleModalScreen } from "../screens/modals/ExampleModalScreen";
+import { FullScreenModalScreen } from "../screens/modals/FullScreenModalScreen";
+import { TransparentModalScreen } from "../screens/modals/TransparentModalScreen";
+import type { RootStackParamList } from "./types";
+import { MainDrawer } from "./MainDrawer";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -20,7 +20,7 @@ export function RootNavigator() {
     <Stack.Navigator
       screenOptions={{
         headerShown: true,
-        animation: 'default',
+        animation: "default",
       }}
     >
       <Stack.Screen
@@ -32,16 +32,16 @@ export function RootNavigator() {
         name="ExampleModal"
         component={ExampleModalScreen}
         options={{
-          title: t('rootModals.exampleTitle'),
-          presentation: 'modal',
+          title: t("rootModals.exampleTitle"),
+          presentation: "modal",
         }}
       />
       <Stack.Screen
         name="TransparentModal"
         component={TransparentModalScreen}
         options={{
-          title: t('rootModals.transparentTitle'),
-          presentation: 'transparentModal',
+          title: t("rootModals.transparentTitle"),
+          presentation: "transparentModal",
           headerShown: false,
         }}
       />
@@ -49,8 +49,8 @@ export function RootNavigator() {
         name="FullScreenModal"
         component={FullScreenModalScreen}
         options={{
-          title: t('rootModals.fullScreenTitle'),
-          presentation: 'fullScreenModal',
+          title: t("rootModals.fullScreenTitle"),
+          presentation: "fullScreenModal",
         }}
       />
     </Stack.Navigator>

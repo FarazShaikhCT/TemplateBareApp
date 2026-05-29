@@ -1,29 +1,29 @@
-import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Animated, ActivityIndicator } from 'react-native';
-import type { InlineLoadingConfig } from './types';
+import React, { useEffect, useRef } from "react";
+import { View, StyleSheet, Animated, ActivityIndicator } from "react-native";
+import type { InlineLoadingConfig } from "./types";
 
 interface InlineLoadingProps extends InlineLoadingConfig {}
 
 export function InlineLoading({
-  size = 'medium',
-  variant = 'spinner',
-  color = '#007AFF',
+  size = "medium",
+  variant = "spinner",
+  color = "#007AFF",
 }: InlineLoadingProps) {
-  const size_value = size === 'small' ? 24 : size === 'large' ? 48 : 36;
+  const size_value = size === "small" ? 24 : size === "large" ? 48 : 36;
 
   const renderLoadingIndicator = () => {
     switch (variant) {
-      case 'spinner':
+      case "spinner":
       default:
         return (
           <ActivityIndicator
-            size={size === 'small' ? 'small' : 'large'}
+            size={size === "small" ? "small" : "large"}
             color={color}
           />
         );
-      case 'dots':
+      case "dots":
         return <DotsLoader size={size_value} color={color} />;
-      case 'pulse':
+      case "pulse":
         return <PulseLoader size={size_value} color={color} />;
     }
   };
@@ -164,12 +164,12 @@ function PulseLoader({ size, color }: { size: number; color: string }) {
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   dotsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   dot: {

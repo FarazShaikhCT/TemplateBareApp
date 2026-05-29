@@ -30,6 +30,11 @@ OLD_SCHEME = "Dev"
 OLD_SCHEME_PROD = "Prod"
 OLD_BUNDLE_DEV = "com.codeandtheory.templatepipelinetest.dev"
 OLD_BUNDLE_DIST = "com.codeandtheory.templatepipelinetest"
+# android-perf in rn.yml (template sample app — rewritten from android/app/build.gradle on kit apply)
+OLD_ANDROID_PACKAGE_DEV = "com.codeandtheory.templaternpipeline.dev"
+OLD_ANDROID_ACTIVITY = (
+    "com.codeandtheory.templaternpipeline.dev/com.codeandtheory.templaternpipeline.MainActivity"
+)
 OLD_ARTIFACT = "Dev-iphonesimulator-Debug-Dev"
 OLD_IOS_BUILD_CONFIG_DEV = "Debug-Dev"
 OLD_IOS_BUILD_CONFIG_DIST = "Release-Prod"
@@ -185,6 +190,16 @@ def android_dev_application_id(content: str) -> str | None:
     return m.group(1).strip() if m else None
 
 
+def android_namespace(content: str) -> str | None:
+    m = re.search(r'namespace\s+["\']([^"\']+)["\']', content)
+    return m.group(1).strip() if m else None
+
+
+def android_perf_launcher_component(dev_application_id: str, namespace: str) -> str:
+    """adb am start -n component: {applicationId}/{namespace}.MainActivity"""
+    return f"{dev_application_id}/{namespace}.MainActivity"
+
+
 def apply_replacements(text: str, mapping: list[tuple[str, str]]) -> str:
     for old, new in mapping:
         if old != new:
@@ -243,6 +258,40 @@ def patch_android_ci_snippets(
             touched.append(name)
             if not dry_run:
                 path.write_text(text, encoding="utf-8")
+    return touched
+
+
+def patch_android_perf_snippets(
+    workflow_dir: Path,
+    package_dev: str,
+    activity: str,
+    dry_run: bool,
+) -> list[str]:
+    """Rewrite android-perf package/activity in rn.yml from the target app's Gradle IDs."""
+    touched: list[str] = []
+    path = workflow_dir / "rn.yml"
+    if not path.is_file():
+        return touched
+    text = path.read_text(encoding="utf-8")
+    orig = text
+    text = re.sub(
+        r'(^\s+package:\s+)"[^"]*"',
+        rf'\1"{package_dev}"',
+        text,
+        count=1,
+        flags=re.MULTILINE,
+    )
+    text = re.sub(
+        r'(^\s+activity:\s+)"[^"]*"',
+        rf'\1"{activity}"',
+        text,
+        count=1,
+        flags=re.MULTILINE,
+    )
+    if text != orig:
+        touched.append("rn.yml (android-perf)")
+        if not dry_run:
+            path.write_text(text, encoding="utf-8")
     return touched
 
 
@@ -382,21 +431,38 @@ def main() -> int:
     print(f"  ios_build_configuration (dist): {ios_build_config_dist}")
     print(f"  android_dev gradle_task: {gradle_task}")
     print(f"  android_dev artifact_glob: {apk_glob}")
+    android_package_dev = OLD_ANDROID_PACKAGE_DEV
+    android_activity = OLD_ANDROID_ACTIVITY
     if gtext:
         aid = android_dev_application_id(gtext)
+        ns = android_namespace(gtext)
         if aid:
+            android_package_dev = aid
             print(f"  android dev applicationId (gradle): {aid}")
+        if ns and aid:
+            android_activity = android_perf_launcher_component(aid, ns)
+            print(f"  android-perf activity component: {android_activity}")
+        elif aid:
+            print(
+                "warning: could not read android namespace — android-perf activity left unchanged; "
+                "set package/activity manually in rn.yml",
+                file=sys.stderr,
+            )
 
     changed = replace_in_workflows(wf_dir, mapping, args.dry_run)
     android_touched = patch_android_ci_snippets(wf_dir, gradle_task, apk_glob, args.dry_run)
+    perf_touched = patch_android_perf_snippets(
+        wf_dir, android_package_dev, android_activity, args.dry_run
+    )
     fastlane_touched = patch_fastfile(root, mapping, args.dry_run)
 
     mode = "Would update" if args.dry_run else "Updated"
     print(f"\n{mode} workflow files (string replacements): {', '.join(changed) or '(none)'}")
     print(f"{mode} Android CI snippets: {', '.join(android_touched) or '(none)'}")
+    print(f"{mode} android-perf package/activity: {', '.join(perf_touched) or '(none)'}")
     print(f"{mode} fastlane/Fastfile: {'yes' if fastlane_touched else '(unchanged or missing)'}")
 
-    if args.dry_run and (changed or android_touched or fastlane_touched):
+    if args.dry_run and (changed or android_touched or perf_touched or fastlane_touched):
         print("\nRe-run without --dry-run to apply.")
 
     return 0

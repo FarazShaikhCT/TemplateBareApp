@@ -1,6 +1,6 @@
-import { createMMKV } from 'react-native-mmkv';
-import { LocalStorage } from './LocalStorage';
-import { LocalStorageKey } from './LocalStorageKeys';
+import { createMMKV } from "react-native-mmkv";
+import { LocalStorage } from "./LocalStorage";
+import { LocalStorageKey } from "./LocalStorageKeys";
 
 export const storage = createMMKV();
 

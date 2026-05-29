@@ -18,22 +18,25 @@ const WIDEVINE_TEST_LICENSE =
   'https://proxy.uat.widevine.com/proxy?provider=widevine_test';
 
 /**
- * FairPlay sample from drm.cloud documentation (CBCS HLS + FPS cert + license URL).
- * The bundled `usertoken` can expire; copy a fresh `acquire-license` URL from:
- * https://developers.drm.cloud/licence-acquisition/examples/fairplay-example
+ * EZDRM public FairPlay demo (HLS + certificate + license server).
+ * @see https://www.ezdrm.com/docs/EZDRM-Shaka-Player.pdf
+ * @see https://github.com/video-dev/hls.js/issues/7156
  *
- * FairPlay typically requires a physical iOS device, not the Simulator.
+ * FairPlay requires a physical iOS device, not the Simulator.
+ *
+ * The previous drm.cloud + AWS MediaPackage URLs are no longer valid (manifest host
+ * NXDOMAIN; bundled drm.cloud JWT expired). Replace these constants with your own
+ * endpoints from your DRM vendor console when integrating production content.
  */
-const FAIRPLAY_DEMO_MANIFEST =
-  'https://e09f957480c8b1e479a1edb0fabc72d8.egress.mediapackage-vod.eu-west-1.amazonaws.com/out/v1/6f12444e793e4206ad363f810cb2aead/9ea4e8148b794c8ba2c6295b824e5ad5/46a61bf2c081464bb9476f2a55a06f48/index.m3u8';
+const FAIRPLAY_DEMO_MANIFEST = 'https://na-fps.ezdrm.com/demo/ezdrm/master.m3u8';
 
-const FAIRPLAY_DEMO_CERTIFICATE =
-  'https://customer-tests.la.drm.cloud/certificate/fairplay?BrandGuid=5a96a0d0-d13f-42b0-ab2b-ba8cfc4aa0a0';
+const FAIRPLAY_DEMO_CERTIFICATE = 'https://fps.ezdrm.com/demo/video/eleisure.cer';
 
 const FAIRPLAY_DEMO_LICENSE =
-  'https://customer-tests.la.drm.cloud/acquire-license/fairplay?KID=4376a4b3-d8ef-4f21-9a6b-faa81a2e59e3&brandguid=5a96a0d0-d13f-42b0-ab2b-ba8cfc4aa0a0&usertoken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MzU2ODk2MDAsImRybVRva2VuSW5mbyI6eyJleHAiOiIyMDI1LTEyLTA3VDE1OjMwOjA5LjU5MDgxMjUrMDE6MDAiLCJraWQiOlsiKiJdLCJwIjp7InBlcnMiOnRydWUsImVkIjoiMjAyNS0xMi0wN1QxNTozMDowOS41OTExMzA1KzAxOjAwIn19fQ.xEToUttAk9AVFgP3bHyDlcvm6BR-8_hsl8V3n-jrDwM';
+  'https://fps.ezdrm.com/api/licenses/b99ed9e5-c641-49d1-bfa8-43692b686ddb';
 
-const FAIRPLAY_DEMO_CONTENT_ID = '4376a4b3-d8ef-4f21-9a6b-faa81a2e59e3';
+/** Matches the asset id in the EZDRM `skd://` URI and license path. */
+const FAIRPLAY_DEMO_CONTENT_ID = 'b99ed9e5-c641-49d1-bfa8-43692b686ddb';
 
 export function buildDemoClearHlsSource(): ReactVideoSource {
   return buildRemoteVideoSource({

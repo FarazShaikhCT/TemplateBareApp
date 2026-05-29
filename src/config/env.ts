@@ -1,23 +1,43 @@
-import Config from 'react-native-config';
-import type { NativeConfig } from 'react-native-config';
+import Constants from "expo-constants";
 
-type AppEnv = 'development' | 'staging' | 'production';
+type AppEnv = "development" | "staging" | "production";
 
-function requireEnv(key: keyof NativeConfig): string {
-  const value = (Config as NativeConfig)[key];
-  if (value == null || String(value).trim() === '') {
-    throw new Error(
-      `Missing react-native-config value: ${String(key)}. ` +
-        'Create project-root `.env.dev`, `.env.qa`, and `.env.prod` (see `.env.example`), ' +
-        'rebuild the native app for that flavor, and on iOS add the `Select Env File` run script if you use env switching.',
-    );
+/**
+ * API base URL is set in app.config.ts `extra.apiBaseUrl` so it matches APP_ENV even when
+ * Metro loads a single `.env.development` (dynamic `process.env[name]` is not inlined for
+ * EXPO_PUBLIC_* and is unreliable).
+ */
+function resolveApiBaseUrl(): string {
+  const extra = Constants.expoConfig?.extra as
+    | { apiBaseUrl?: string; appEnv?: string }
+    | undefined;
+  const fromExtra = extra?.apiBaseUrl?.trim();
+  if (fromExtra) return fromExtra;
+  // Static access — Metro can inline for dev-only setups without embedded extra.
+  const inlined = process.env.EXPO_PUBLIC_API_BASE_URL;
+  if (typeof inlined === "string" && inlined.length > 0) return inlined.trim();
+  throw new Error(
+    "Missing API base URL: rebuild the app so app.config.ts runs (extra.apiBaseUrl), or set EXPO_PUBLIC_API_BASE_URL.",
+  );
+}
+
+/** Same flavor as app.config.ts / native ids — prefer app.json extra (set at build time). */
+function resolveAppEnv(): AppEnv {
+  const extra = Constants.expoConfig?.extra as { appEnv?: string } | undefined;
+  const fromExtra = extra?.appEnv;
+  if (
+    fromExtra === "development" ||
+    fromExtra === "staging" ||
+    fromExtra === "production"
+  ) {
+    return fromExtra;
   }
-  return String(value).trim();
+  return (process.env.EXPO_PUBLIC_APP_ENV ?? "development") as AppEnv;
 }
 
 const env = {
-  apiBaseUrl: requireEnv('API_BASE_URL'),
-  appEnv: ((Config as NativeConfig).APP_ENV ?? 'development') as AppEnv,
+  apiBaseUrl: resolveApiBaseUrl(),
+  appEnv: resolveAppEnv(),
 } as const;
 
 export default env;

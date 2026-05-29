@@ -1,12 +1,12 @@
-import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Animated, type DimensionValue } from 'react-native';
-import type { SkeletonConfig } from './types';
+import React, { useEffect, useRef } from "react";
+import { View, StyleSheet, Animated, type DimensionValue } from "react-native";
+import type { SkeletonConfig } from "./types";
 
 interface SkeletonViewProps extends SkeletonConfig {}
 
 export function SkeletonView({
   lines = 1,
-  width = '100%',
+  width = "100%",
   height = 16,
   borderRadius = 4,
   animated = true,
@@ -40,7 +40,7 @@ export function SkeletonView({
   const lineElements = [];
   for (let i = 0; i < lines; i++) {
     const isLastLine = i === lines - 1;
-    const lineWidth = isLastLine && lines > 1 ? '70%' : width;
+    const lineWidth = isLastLine && lines > 1 ? "70%" : width;
 
     lineElements.push(
       <Animated.View
@@ -64,9 +64,9 @@ export function SkeletonView({
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
+    width: "100%",
   },
   skeleton: {
-    backgroundColor: '#E1E9EE',
+    backgroundColor: "#E1E9EE",
   },
 });

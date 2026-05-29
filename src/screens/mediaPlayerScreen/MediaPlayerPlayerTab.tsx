@@ -240,10 +240,10 @@ export function MediaPlayerPlayerTab({
       ) : null}
       {Platform.OS === 'ios' && playbackMode === 'drm-demo' ? (
         <Text style={styles.hint}>
-          iOS: <Text style={styles.mono}>DRMType.FAIRPLAY</Text>,{' '}
-          <Text style={styles.mono}>certificateUrl</Text>,{' '}
-          <Text style={styles.mono}>licenseServer</Text>, optional{' '}
-          <Text style={styles.mono}>contentId</Text>.
+          iOS: <Text style={styles.mono}>DRMType.FAIRPLAY</Text> with EZDRM public demo assets (
+          <Text style={styles.mono}>certificateUrl</Text>,{" "}
+          <Text style={styles.mono}>licenseServer</Text>). Use a physical device; swap URLs for your
+          DRM vendor before production.
         </Text>
       ) : null}
     </ScrollView>

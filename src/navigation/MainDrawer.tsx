@@ -3,14 +3,14 @@ import {
   DrawerContentComponentProps,
   DrawerContentScrollView,
   DrawerItemList,
-} from '@react-navigation/drawer';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
+} from "@react-navigation/drawer";
+import React from "react";
+import { useTranslation } from "react-i18next";
 
-import { AboutDrawerScreen } from '../screens/drawer/AboutDrawerScreen';
-import type { DrawerParamList } from './types';
-import { MainTabs } from './MainTabs';
-import { SettingsScreen } from '../screens/profile/SettingsScreen';
+import { AboutDrawerScreen } from "../screens/drawer/AboutDrawerScreen";
+import type { DrawerParamList } from "./types";
+import { MainTabs } from "./MainTabs";
+import { SettingsScreen } from "../screens/profile/SettingsScreen";
 import { MediaPlayerScreen } from '../screens/MediaPlayerScreen';
 import { AnalyticsDemoScreen } from '../screens/analytics/AnalyticsDemoScreen';
 import { FeedbackCatalogScreen } from '../screens/FeedbackCatalogScreen';
@@ -51,7 +51,7 @@ export function MainDrawer() {
     <Drawer.Navigator
       drawerContent={p => <MainDrawerContent {...p} />}
       screenOptions={{
-        drawerType: 'front',
+        drawerType: "front",
         headerShown: false,
       }}
     >
@@ -59,69 +59,60 @@ export function MainDrawer() {
         name="TabRoot"
         component={MainTabs}
         options={{
-          title: t('drawer.tabRootTitle'),
-          drawerLabel: t('drawer.tabRootLabel'),
+          title: t("drawer.tabRootTitle"),
+          drawerLabel: t("drawer.tabRootLabel"),
         }}
       />
       <Drawer.Screen
         name="Settings"
         component={SettingsScreen}
-        options={{ title: t('drawer.settingsTitle') }}
+        options={{ title: t("drawer.settingsTitle") }}
       />
       <Drawer.Screen
         name="About"
         component={AboutDrawerScreen}
-        options={{ title: t('drawer.aboutTitle') }}
+        options={{ title: t("drawer.aboutTitle") }}
       />
       <Drawer.Screen
-        name="MediaPlayer"
-        component={MediaPlayerScreen}
-        options={{
-          title: 'Media player',
-          drawerLabel: 'Media player (HLS / DRM / offline / PiP)',
-        }}
-      />
+              name="MediaPlayer"
+              component={MediaPlayerScreen}
+              options={{ title: 'Media player', drawerLabel: 'Media player (HLS / DRM / offline / PiP)' }}
+            />
       <Drawer.Screen
-        name="AnalyticsDemo"
-        component={AnalyticsDemoScreen}
-        options={{ title: 'Analytics demo', drawerLabel: 'Analytics demo' }}
-      />
+              name="AnalyticsDemo"
+              component={AnalyticsDemoScreen}
+              options={{ title: 'Analytics demo', drawerLabel: 'Analytics demo' }}
+            />
       <Drawer.Screen
-        name="FeedbackCatalog"
-        component={FeedbackCatalogScreen}
-        options={{ title: 'Feedback', drawerLabel: 'Feedback Catalog' }}
-      />
+              name="FeedbackCatalog"
+              component={FeedbackCatalogScreen}
+              options={{ title: 'Feedback', drawerLabel: 'Feedback Catalog' }}
+            />
       <Drawer.Screen
-        name="RemoteConfig"
-        component={RemoteConfigScreen}
-        options={{ title: 'Remote config', drawerLabel: 'Remote config' }}
-      />
+              name="RemoteConfig"
+              component={RemoteConfigScreen}
+              options={{ title: 'Remote config', drawerLabel: 'Remote config' }}
+            />
       <Drawer.Screen
-        name="NotificationsCatalog"
-        component={NotificationsCatalogScreen}
-        options={{
-          title: 'Notifications',
-          drawerLabel: 'Notifications Catalog',
-        }}
-      />
+              name="NotificationsCatalog"
+              component={NotificationsCatalogScreen}
+              options={{ title: 'Notifications', drawerLabel: 'Notifications Catalog' }}
+            />
       <Drawer.Screen
-        name="CarouselCatalog"
-        component={CarouselCatalogScreen}
-        options={{ title: 'Carousel', drawerLabel: 'Carousel Catalog' }}
-      />
+              name="CarouselCatalog"
+              component={CarouselCatalogScreen}
+              options={{ title: 'Carousel', drawerLabel: 'Carousel Catalog' }}
+            />
       <Drawer.Screen
-        name="PermissionsDemo"
-        component={PermissionsDemoScreen}
-        options={{ title: 'Permissions', drawerLabel: 'Permissions' }}
-      />
+              name="PermissionsDemo"
+              component={PermissionsDemoScreen}
+              options={{ title: 'Permissions', drawerLabel: 'Permissions' }}
+            />
       <Drawer.Screen
-        name="CrashLoggerDemo"
-        component={CrashLoggerDemoScreen}
-        options={{
-          title: 'Crash Logger demo',
-          drawerLabel: 'Crash Logger demo',
-        }}
-      />
+              name="CrashLoggerDemo"
+              component={CrashLoggerDemoScreen}
+              options={{ title: 'Crash Logger demo', drawerLabel: 'Crash Logger demo' }}
+            />
     </Drawer.Navigator>
   );
 }

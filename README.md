@@ -1,103 +1,46 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Expo RN template
 
-# Getting Started
+Expo SDK app aligned with the Code & Theory React Native template (navigation, theme, TanStack Query, i18n, MMKV).
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## CI (GitHub Actions)
 
-## Step 1: Start Metro
+After you apply the shared **`rn.yml`** workflow from **`template-pipeline-react-native`** (see that repo’s **`docs/RN_WORKFLOW_REUSE.md`** and **`CURSOR_RN_DEVOPS_ONE_SHOT_APPLY.txt`**):
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+- **Workflow integration requires `expo prebuild`:** run **`npx expo prebuild --clean`** with the correct **`APP_ENV`** (or your flavor scripts in `package.json`), then **commit the generated `android/` and `ios/`** directories to git. The pipeline’s **`expo-native-dirs`** gate fails if those trees are missing, with an error pointing you to prebuild and commit again.
+- **Root `Gemfile` / `Gemfile.lock`:** Shipped at the repo root for **Bundler** (CI runs `bundle install`, then `bundle exec pod install` for iOS). **`expo prebuild` does not create these files** — keep them when copying the template or applying the DevOps kit.
+- **`fastlane/` (Fastfile):** **Not** part of this Expo template tree. The canonical **`fastlane/`** lives in **`template-pipeline-react-native`** and is **copied into your app repo when you apply the RN DevOps kit** (same step as `.github/` — see that repo’s **`SETUP_RN_DEVOPS_KIT.md`** / **`CURSOR_RN_DEVOPS_ONE_SHOT_APPLY.txt`**). After **`expo prebuild`** and a committed **`ios/`** tree, run **`python3 .github/scripts/bootstrap_rn_workflow_ids.py`** so `Fastfile` workspace / IPA paths match your Xcode project.
+- **Detect:** `package.json` listing the **`expo`** package makes `detect` output **`expo`**. Native **`android-dev`** / **`ios-dev`** jobs then run on GitHub runners (Gradle + Fastlane + optional Firebase), same pattern as a bare app—**no cloud build step in the default `rn.yml` orchestrator.**
+- **JS gates:** `npm run lint` (`expo lint`), `npm run format:check`, `npm run typecheck`, `npm run test:ci` (coverage threshold matches the pipeline).
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+Use `npm run format` to fix Prettier issues locally. Install dependencies with **`npm ci`** in CI (this template ships **`package-lock.json`** only).
+
+**Development client:** This template includes **`expo-dev-client`**. After prebuild, use **`npm run ios:*` / `npm run android:*`** or open the generated native project, install the dev build on a device or simulator, then **`npx expo start`** and open the app in that client (not Expo Go). See [Development builds](https://docs.expo.dev/develop/development-builds/introduction/).
+
+**iOS / Android signing in CI:** Configure the same **GitHub Actions secrets** as a bare app (keystore, distribution or dev signing certs/profiles, Firebase) per **`GITHUB_SECRETS_CHECKLIST.md`** from the pipeline repo. Run **`python3 .github/scripts/bootstrap_rn_workflow_ids.py`** after prebuild so `rn.yml` Gradle tasks, APK globs, bundle id, and Xcode scheme match your generated project.
+
+**Prebuild / native-only tweaks:** If you add bare-style native config (for example resource shrinking), mirror patterns from **`CliTemplate`** where applicable. Env at runtime uses **`expo-constants`** and **`app.config.ts`** flavors, not `react-native-config`.
+
+**CocoaPods deployment targets:** After **`expo prebuild`**, some dependencies ship with a low **`IPHONEOS_DEPLOYMENT_TARGET`** (for example **11.0**), which Xcode’s SDK flags as unsupported next to your app’s **`platform :ios`**. In **`ios/Podfile`**, inside the existing **`post_install`** hook **after** **`react_native_post_install`**, normalize pod targets to at least **`12.0`** and your app’s deployment target, for example:
+
+```ruby
+    app_ios = podfile_properties['ios.deploymentTarget'] || '15.1'
+    min_supported = [12.0, app_ios.to_f].max
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |cfg|
+        current = cfg.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
+        next if current.nil?
+        cfg.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = min_supported.to_s if current.to_f < min_supported
+      end
+    end
+```
+
+Then run **`bundle exec pod install --project-directory=ios`** and commit **`Podfile.lock`** when it changes. Re-apply after regenerating **`ios/`** if the hook is not preserved by your prebuild workflow.
+
+## Local development
 
 ```sh
-# Using npm
+npm install
 npm start
-
-# OR using Yarn
-yarn start
 ```
 
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
-```
-
-**Android release builds:** Release variants use R8 (`minifyEnabled`) and resource shrinking (`shrinkResources`). `react-native-config` needs the generated string `build_config_package`, which is kept via `android/app/src/main/res/raw/keep.xml`. If you upgrade from an older template that used `-keepresources` in `proguard-rules.pro`, remove that line (R8 rejects it) and ensure this `keep.xml` is present, or re-merge `android/` from the current template.
-
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
-
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
-
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-## GitHub Actions (CT RN DevOps kit)
-
-This app is generated from **CT React Native Template** and does not ship `.github/workflows` in the template copy. To add the reusable **`rn.yml`** CI kit, clone **`template-pipeline-react-native`**, open this app as your Cursor workspace, and follow **`CURSOR_RN_DEVOPS_ONE_SHOT_APPLY.txt`** in that repo (set **`TEMPLATE_ROOT`** to the clone’s absolute path). Then run **`python3 .github/scripts/bootstrap_rn_workflow_ids.py`** and configure secrets from **`GITHUB_SECRETS_CHECKLIST.md`**. See the generator repo **`README.md`** (“GitHub Actions (bare / CliTemplate)”).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+See [Expo documentation](https://docs.expo.dev/) for environment setup and **`expo prebuild`**.

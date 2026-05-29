@@ -1,10 +1,8 @@
 {
-  "extends": "@react-native/typescript-config",
+  "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "types": ["jest", "react-native-vector-icons"],
+    "strict": true,
     "jsx": "react-jsx",
     "resolveJsonModule": true
-  },
-  "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["**/node_modules", "**/Pods"]
+  }
 }

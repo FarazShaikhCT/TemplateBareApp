@@ -1,4 +1,66 @@
 {
-  "name": "TemplateBareApp",
-  "displayName": "TemplateBareApp"
+  "expo": {
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static",
+            "buildReactNativeFromSource": true
+          },
+          "android": {
+            "extraMavenRepos": [
+              "../../node_modules/@notifee/react-native/android/libs"
+            ]
+          }
+        }
+      ],
+      "./plugins/withAndroidPip",
+      "@react-native-firebase/app",
+      "@react-native-firebase/crashlytics",
+      "react-native-video",
+      [
+        "react-native-permissions",
+        {
+          "iosPermissions": [
+            "Camera",
+            "Microphone",
+            "LocationWhenInUse",
+            "PhotoLibrary",
+            "Contacts"
+          ]
+        }
+      ]
+    ],
+    "android": {
+      "googleServicesFile": "./google-services.json",
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.SCHEDULE_EXACT_ALARM",
+        "android.permission.VIBRATE",
+        "android.permission.WAKE_LOCK",
+        "CAMERA",
+        "READ_CONTACTS",
+        "READ_MEDIA_IMAGES",
+        "RECORD_AUDIO"
+      ]
+    },
+    "ios": {
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "audio",
+          "picture-in-picture"
+        ],
+        "NSCameraUsageDescription": "This app needs access to the camera.",
+        "NSMicrophoneUsageDescription": "This app needs access to the microphone.",
+        "NSLocationWhenInUseUsageDescription": "This app needs access to your location while in use.",
+        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library.",
+        "NSContactsUsageDescription": "This app needs access to your contacts."
+      }
+    }
+  }
 }

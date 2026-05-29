@@ -1,9 +1,6 @@
-import { useRef, useCallback } from 'react';
-import type {
-  NavigationContainerRef,
-  ParamListBase,
-} from '@react-navigation/native';
-import { logScreenView } from './analytics';
+import { useRef, useCallback } from "react";
+import type { NavigationContainerRef } from "@react-navigation/native";
+import { logScreenView } from "./analytics";
 
 /**
  * Hook that tracks screen views via Firebase Analytics.
@@ -16,8 +13,8 @@ import { logScreenView } from './analytics';
  * ```
  */
 export function useAnalyticsScreenTracking() {
-  const navigationRef = useRef<NavigationContainerRef<ParamListBase>>(null);
-  const routeNameRef = useRef<string | undefined>(undefined);
+  const navigationRef = useRef<NavigationContainerRef<{}>>(null);
+  const routeNameRef = useRef<string | undefined>();
 
   const onReady = useCallback(() => {
     routeNameRef.current = navigationRef.current?.getCurrentRoute()?.name;

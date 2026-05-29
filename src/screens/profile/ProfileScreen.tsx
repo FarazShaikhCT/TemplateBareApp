@@ -1,12 +1,12 @@
-import { CommonActions, DrawerActions } from '@react-navigation/native';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Pressable, Text, View } from 'react-native';
+import { CommonActions, DrawerActions } from "@react-navigation/native";
+import React from "react";
+import { useTranslation } from "react-i18next";
+import { Pressable, Text, View } from "react-native";
 
-import { TopBar } from '../../components/TopBar';
-import { APP_DISPLAY_NAME } from '../../config/appDisplayName';
-import type { ProfileMainCompositeProps } from '../../navigation/screenTypes';
-import { useThemedStyles } from '../../theme/useThemedStyles';
+import { TopBar } from "../../components/TopBar";
+import { APP_DISPLAY_NAME } from "../../config/appDisplayName";
+import type { ProfileMainCompositeProps } from "../../navigation/screenTypes";
+import { useThemedStyles } from "../../theme/useThemedStyles";
 
 type Props = ProfileMainCompositeProps;
 
@@ -22,14 +22,14 @@ export function ProfileScreen({ navigation }: Props) {
         backgroundColor: colors.background,
         paddingTop: 16,
       },
-      title: { fontSize: 22, fontWeight: '700', color: colors.text1 },
+      title: { fontSize: 22, fontWeight: "700", color: colors.text1 },
       btn: {
         backgroundColor: colors.secondary,
         paddingVertical: 12,
         paddingHorizontal: 14,
         borderRadius: 8,
       },
-      btnText: { color: colors.textOnSecondary, fontWeight: '600' },
+      btnText: { color: colors.textOnSecondary, fontWeight: "600" },
     }),
     [],
   );
@@ -41,13 +41,13 @@ export function ProfileScreen({ navigation }: Props) {
         onMenuPress={() => navigation.dispatch(DrawerActions.openDrawer())}
       />
       <View style={styles.container}>
-        <Text style={styles.title}>{t('profile.title')}</Text>
+        <Text style={styles.title}>{t("profile.title")}</Text>
 
         <Pressable
           style={styles.btn}
-          onPress={() => navigation.navigate('Settings')}
+          onPress={() => navigation.navigate("Settings")}
         >
-          <Text style={styles.btnText}>{t('profile.navigateSettings')}</Text>
+          <Text style={styles.btnText}>{t("profile.navigateSettings")}</Text>
         </Pressable>
 
         <Pressable
@@ -56,12 +56,12 @@ export function ProfileScreen({ navigation }: Props) {
             navigation.dispatch(
               CommonActions.reset({
                 index: 0,
-                routes: [{ name: 'ProfileMain' }],
+                routes: [{ name: "ProfileMain" }],
               }),
             )
           }
         >
-          <Text style={styles.btnText}>{t('profile.reset')}</Text>
+          <Text style={styles.btnText}>{t("profile.reset")}</Text>
         </Pressable>
       </View>
     </View>

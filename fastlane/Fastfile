@@ -26,30 +26,33 @@ platform :ios do
       next_build = latest.to_i + 1
       increment_build_number(
         build_number: next_build.to_s,
-        xcodeproj: "ios/TemplateBareApp.xcodeproj"
+        xcodeproj: "ios/TemplateExpoTemplateExpoDev.xcodeproj"
       )
       UI.success("Set CFBundleVersion to #{next_build} (latest TestFlight was #{latest.to_i})")
     end
+
+    export_method = ENV["IOS_EXPORT_METHOD"].to_s.strip
+    export_method = "app-store" if export_method.empty?
 
     xcargs = {
       "CODE_SIGN_STYLE" => "Manual",
       "DEVELOPMENT_TEAM" => team_id,
       "PROVISIONING_PROFILE_SPECIFIER" => profile_name
     }
-    identity = ENV["IOS_CODESIGN_IDENTITY"]
-    xcargs["CODE_SIGN_IDENTITY"] = identity if identity && !identity.to_s.empty?
-
-    # app-store = TestFlight / App Store profiles; ad-hoc = Firebase internal testers (distribution profile + devices)
-    export_method = ENV["IOS_EXPORT_METHOD"].to_s.strip
-    export_method = "app-store" if export_method.empty?
+    identity = ENV["IOS_CODESIGN_IDENTITY"].to_s.strip
+    if identity.empty? && %w[app-store ad-hoc].include?(export_method)
+      identity = "Apple Distribution"
+    end
+    # Only CODE_SIGN_IDENTITY — bracketed sdk= keys break xcodebuild when gym passes xcargs via shell.
+    xcargs["CODE_SIGN_IDENTITY"] = identity if identity && !identity.empty?
 
     bc = ENV["IOS_BUILD_CONFIGURATION"]
     gym_args = {
-      workspace: "ios/TemplateBareApp.xcworkspace",
-      scheme: ENV.fetch("IOS_SCHEME", "TemplatePipelineReactNative"),
+      workspace: "ios/TemplateExpoTemplateExpoDev.xcworkspace",
+      scheme: ENV.fetch("IOS_SCHEME", "TemplateExpoTemplateExpoDev"),
       export_method: export_method,
       output_directory: "build",
-      output_name: "TemplateBareApp.ipa",
+      output_name: "TemplateExpoTemplateExpoDev.ipa",
       clean: true,
       xcargs: xcargs,
       export_options: {
